@@ -9,6 +9,6 @@ stats.json
 npm-debug.log
 .idea
 
-notes.org
 .dir-locals.el
 .yarnclean
+draft
