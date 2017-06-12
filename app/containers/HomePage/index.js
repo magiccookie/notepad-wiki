@@ -5,15 +5,18 @@
 
 import React from 'react';
 import { Form, Grid, Segment, TextArea } from 'semantic-ui-react';
+import marked from 'marked';
 
 import './style.css';
+
+import example from './example.md';
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
     this.note1 = {
-      text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt. ',
+      text: example,
       header: 'Header',
     };
 
@@ -56,6 +59,11 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
     this.setState({ firstNote: newNote });
   }
 
+  markedText = (text) => {
+    const mdHtml = marked(text, { sanitize: true });
+    return { __html: mdHtml };
+  }
+
   render() {
     return (
       <Grid
@@ -86,12 +94,7 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                     />
                   </Form>
                   ) : (
-                    <p>
-                      {this.state.firstNote.text}
-                      <a href="#note2" onClick={(e) => this.handleClickLink(e)}>
-                        Link to another note
-                      </a>
-                    </p>
+                    <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
                   )
                 }
               </article>
@@ -104,14 +107,14 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
                   <Segment>
                     <article>
                       <h1>{this.state.firstNote.header}</h1>
-                      <p>{this.state.firstNote.text}</p>
+                      <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
                     </article>
                   </Segment>
                   ) : (
                     <Segment>
                       <article>
                         <h1>{this.state.secondNote.header}</h1>
-                        <p>{this.state.secondNote.text}</p>
+                        <p dangerouslySetInnerHTML={this.markedText(this.state.secondNote.text)}></p>
                       </article>
                     </Segment>
                   )
