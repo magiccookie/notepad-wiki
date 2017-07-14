@@ -1,0 +1,10 @@
+.login {
+  flex: 0 1 auto;
+}
+
+.login__link {
+  margin-top: 1rem;
+  margin-right: 2rem;
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+}

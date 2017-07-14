@@ -1,7 +1,3 @@
-// These are the pages you can go to.
-// They are all wrapped in the App component, which should contain the navbar etc
-// See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
-// about the code splitting business
 import { getAsyncInjectors } from 'utils/asyncInjectors';
 
 const errorLoading = (err) => {
@@ -13,10 +9,10 @@ const loadModule = (cb) => (componentModule) => {
 };
 
 export default function createRoutes(store) {
-  // Create reusable async injectors using getAsyncInjectors factory
+
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
 
-  return [
+  const childRoutes = [
     {
       path: '/',
       name: 'home',
@@ -34,6 +30,42 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/login',
+      name: 'loginForm',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/LoginForm'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/signup',
+      name: 'signUpForm',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/SignUpForm/reducer'),
+          import('containers/SignUpForm/sagas'),
+          import('containers/SignUpForm'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('signUpForm', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
@@ -43,4 +75,23 @@ export default function createRoutes(store) {
       },
     },
   ];
+
+  return {
+    getComponent(nextState, cb) {
+      const importModules = Promise.all([
+        import('reducers/Auth/sagas'),
+        import('containers/App'),
+      ]);
+
+      const renderRoute = loadModule(cb);
+
+      importModules.then(([sagas, component]) => {
+        injectSagas(sagas.default);
+        renderRoute(component);
+      });
+
+      importModules.catch(errorLoading);
+    },
+    childRoutes,
+  };
 }

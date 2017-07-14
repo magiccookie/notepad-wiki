@@ -1,0 +1,9 @@
+.logo {
+  flex: 1;
+}
+
+.logo__link {
+  margin-top: 1rem;
+  margin-left: 2rem;
+  color: #000;
+}

@@ -24,7 +24,7 @@ export default class App extends React.PureComponent { // eslint-disable-line re
   render() {
     return (
       <div>
-        <Helmet title="notebook" />
+        <Helmet title="notepad-wiki" />
         {React.Children.toArray(this.props.children)}
       </div>
     );
