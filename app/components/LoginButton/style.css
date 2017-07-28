@@ -8,3 +8,8 @@
   border-bottom-width: 1px;
   border-bottom-style: dotted;
 }
+
+.login__profile {
+  margin-top: 1rem;
+  margin-right: 2rem;
+}

@@ -5,7 +5,15 @@
 */
 
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
+
+import {
+  makeSelectLoggedIn,
+  makeSelectProfile,
+} from '../../reducers/Auth/selectors';
+
+import { wipeAuthState } from '../../reducers/Auth/actions';
 
 import './style.css';
 
@@ -13,27 +21,48 @@ class LoginButton extends React.Component { // eslint-disable-line react/prefer-
 
   constructor(props) {
     super(props);
-    this.state = {
-      authState: {
-        status: false,
-        username: "",
-      }};
+    this.state = {};
   }
+
+  logOut = (e) => {
+    e.preventDefault();
+    this.props.dispatch(wipeAuthState());
+  };
 
   render() {
     return (
       <div className="login">
-        <Link
-          className="login__link"
-          to="/login/"
-        >
-          Log-in/Sign up
-        </Link>
+        { this.props.loggedIn ? (
+            <span className="login__profile">
+              { this.props.profile.username } (<a href="/" onClick={this.logOut}>log out</a>)
+            </span>
+          ) : (
+            <Link
+              className="login__link"
+              to="/login/"
+            >
+              Log-in/Sign up
+            </Link>
+          )
+        }
       </div>
     );
   }
 }
 
-LoginButton.propTypes = {};
+LoginButton.propTypes = {
+  loggedIn: PropTypes.bool.isRequired,
+  profile: PropTypes.object.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
 
-export default LoginButton;
+const mapDispatchToProps = (dispatch) =>({ dispatch });
+
+const mapStateToProps = (state) => (
+  {
+    loggedIn: makeSelectLoggedIn(state),
+    profile: makeSelectProfile(state),
+  }
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginButton);

@@ -6,6 +6,8 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+
 import { Link } from 'react-router';
 import Helmet from 'react-helmet';
 
@@ -15,22 +17,36 @@ import { Form, Grid, Header,
 
 import Panel from '../../components/Panel';
 
-import makeSelectAuthState from '../../reducers/Auth/selectors';
+import { Authorize } from '../../reducers/Auth/actions';
+import { makeSelectLoggedIn } from '../../reducers/Auth/selectors';
+
 import './style.css';
 
 export class LoginForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      username: '',
-      password: '',
-    };
+    this.state = { username: '', password: '' };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.loggedIn) this.props.dispatch(push('/'));
   }
 
   handleFormChange = (e) => {
     let value = e.target.value;
     if (e.target.name === 'username') value = value.toLowerCase();
     this.setState({ [e.target.name]: value });
+  }
+
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(`A value to submit: ${JSON.stringify(this.state)}`);
+
+    if (this.state.username && this.state.password) {
+      this.props.dispatch(Authorize(this.state));
+      this.setState({ username: '', password: '' });
+    }
   }
 
   render() {
@@ -93,13 +109,16 @@ export class LoginForm extends React.Component { // eslint-disable-line react/pr
 }
 
 LoginForm.propTypes = {
+  loggedIn: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatch,
-  };
-}
+const mapStateToProps = (state) => (
+  {
+    loggedIn: makeSelectLoggedIn(state),
+  }
+);
 
-export default connect(null, mapDispatchToProps)(LoginForm);
+const mapDispatchToProps = (dispatch) => ({ dispatch });
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);
