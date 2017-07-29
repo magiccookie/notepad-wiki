@@ -83,6 +83,7 @@ module.exports = (options) => ({
       },
     }),
     new webpack.NamedModulesPlugin(),
+    new webpack.ContextReplacementPlugin(/\.\/locale$/, 'empty-module', false, /js$/),
   ]),
   resolve: {
     modules: ['app', 'node_modules'],
@@ -100,4 +101,9 @@ module.exports = (options) => ({
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
   performance: options.performance || {},
+  node: {
+    net: 'empty',
+    tls: 'empty',
+    dns: 'empty'
+  }
 });
