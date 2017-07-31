@@ -10,24 +10,52 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ngrok = (isDev && process.env.ENABLE_TUNNEL) || argv.tunnel ? require('ngrok') : false;
 const resolve = require('path').resolve;
 
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
+const ExtractJwt = passportJWT.ExtractJwt;
+const Strategy = passportJWT.Strategy;
+
 const jwt = require('jwt-simple');
+
+const morgan = require('morgan');
 const logger = require('./logger');
+
 const users = require('./users');
-const config = require('./config');
-const auth = require('./auth')();
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(auth.initialize());
+app.use(passport.initialize());
 
-const mockServer = jsonServer.create();
-mockServer.use(jsonServer.defaults());
-mockServer.use(jsonServer.router('db.json'));
+if (isDev) {
+  const format = ':method :url :status :response-time ms - :res[content-length]'
+  app.use(morgan(format));
+}
 
-app.get("/myusername", auth.authenticate(), (req, res) => {
-  res.json({ message: util.format('hello %s', req.user.username) });
+const crypto = require('crypto');
+const config = { jwtSecret: crypto.randomBytes(32).toString('hex')};
+
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeader(),
+  secretOrKey: config.jwtSecret,
+  algorithms: ['HS256']
+};
+
+const strategy =  new Strategy(opts, (payload, done) => {
+  const user = users.find((u) =>
+    { return u.username === payload.username }) || null;
+  if (user) {
+    return done(null, payload);
+  } else {
+    return done(new Error("User not found"), null);
+  }
+});
+
+passport.use(strategy);
+authCheck = () => passport.authenticate("jwt", { session: false } );
+app.post("/api/check", authCheck(), (req, res) => {
+  res.json(req.user);
 });
 
 app.post("/api/token", (req, res) => {
@@ -40,7 +68,7 @@ app.post("/api/token", (req, res) => {
     });
 
     if (user) {
-      const payload = { username: user.username };
+      const payload = { username: username };
       const token = jwt.encode(payload, config.jwtSecret);
       res.json({ token: token });
     } else {
@@ -51,6 +79,9 @@ app.post("/api/token", (req, res) => {
   }
 });
 
+const mockServer = jsonServer.create();
+mockServer.use(jsonServer.defaults());
+mockServer.use(jsonServer.router('db.json'));
 app.use('/api', mockServer);
 
 // In production we need to pass these values in instead of relying on webpack

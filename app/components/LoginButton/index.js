@@ -13,7 +13,10 @@ import {
   makeSelectProfile,
 } from '../../reducers/Auth/selectors';
 
-import { wipeAuthState } from '../../reducers/Auth/actions';
+import {
+  checkAuth,
+  logOut,
+} from '../../reducers/Auth/actions';
 
 import './style.css';
 
@@ -24,9 +27,13 @@ class LoginButton extends React.Component { // eslint-disable-line react/prefer-
     this.state = {};
   }
 
+  componentWillMount() {
+    this.props.dispatch(checkAuth());
+  }
+
   logOut = (e) => {
     e.preventDefault();
-    this.props.dispatch(wipeAuthState());
+    this.props.dispatch(logOut());
   };
 
   render() {
@@ -34,7 +41,7 @@ class LoginButton extends React.Component { // eslint-disable-line react/prefer-
       <div className="login">
         { this.props.loggedIn ? (
             <span className="login__profile">
-              { this.props.profile.username } (<a href="/" onClick={this.logOut}>log out</a>)
+              { this.props.profile.get('username')} (<a href="/" onClick={this.logOut}>log out</a>)
             </span>
           ) : (
             <Link

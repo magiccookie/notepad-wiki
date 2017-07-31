@@ -9,6 +9,8 @@ import {
   WIPE_TMP_CREDITS,
   CHANGE_AUTH_STATE,
   WIPE_AUTH_STATE,
+  CHECK_AUTH,
+  LOG_OUT,
 } from './constants';
 
 export function Authorize(tmpCredits) {
@@ -16,6 +18,14 @@ export function Authorize(tmpCredits) {
     type: AUTHORIZE,
     payload: tmpCredits,
   };
+}
+
+export function checkAuth() {
+  return { type: CHECK_AUTH };
+}
+
+export function logOut() {
+  return { type: LOG_OUT };
 }
 
 export function changeAuthState(authState) {

@@ -22,6 +22,8 @@ function checkStatus(response) {
   throw error;
 }
 
+const toImmutable = (data) => fromJS(data);
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',
@@ -33,4 +35,15 @@ export function requestAuth(data) {
     .then(toImmutable);
 }
 
-const toImmutable = (data) => fromJS(data);
+export function requestCheckUser(token) {
+  return fetch('/api/check', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}
