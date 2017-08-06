@@ -82,7 +82,7 @@ app.post("/api/token", (req, res) => {
 const mockServer = jsonServer.create();
 mockServer.use(jsonServer.defaults());
 mockServer.use(jsonServer.router('db.json'));
-app.use('/api', mockServer);
+app.use('/api', authCheck(), mockServer);
 
 // In production we need to pass these values in instead of relying on webpack
 setup(app, {

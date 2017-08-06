@@ -24,6 +24,19 @@ function checkStatus(response) {
 
 const toImmutable = (data) => fromJS(data);
 
+export function fetchPosts(token) {
+  return fetch('/api/posts', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',

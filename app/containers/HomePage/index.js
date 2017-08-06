@@ -3,131 +3,80 @@
  *
  */
 
-import React from 'react';
-import { Form, Grid, Segment, TextArea } from 'semantic-ui-react';
-import marked from 'marked';
+import React, { PropTypes } from 'react';
+import { Card, Container } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+
+import { makeSelectLoggedIn } from '../../reducers/Auth/selectors';
+import { makeSelectPosts } from './selectors';
+
+import { getLatestPosts } from './actions';
 
 import Panel from '../../components/Panel';
 import './style.css';
 
-import example from './example.md';
-
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
-    this.note1 = {
-      text: example,
-      header: 'Header',
-    };
-
-    this.note2 = {
-      text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt.',
-      header: 'Secondary article',
-    };
-
-    this.state = {
-      isSplitMode: false,
-      isEditMode: false,
-      firstNote: this.note1,
-      secondNote: this.note2,
-    };
+    this.state = {};
   }
 
-  toggleSplitMode = () => {
-    const curSplit = this.state.isSplitMode;
-    this.setState({ isSplitMode: !curSplit });
+  componentWillMount() {
+    this.props.dispatch(getLatestPosts());
   }
 
-  toggleEditMode = () => {
-    const curEdit = this.state.isEditMode;
-    const curSplit = curEdit;
-    this.setState({ isSplitMode: !curSplit, isEditMode: !curEdit });
-  }
-
-  handleClickLink = (e) => {
+  clickOnCard = (e) => {
     e.preventDefault();
-    this.toggleSplitMode();
-  }
-
-  handleClickEdit = (e) => {
-    e.preventDefault();
-    this.toggleEditMode();
-  }
-
-  handleEdit = (e) => {
-    const newNote = { ...this.state.firstNote, text: e.target.value };
-    this.setState({ firstNote: newNote });
-  }
-
-  markedText = (text) => {
-    const mdHtml = marked(text, { sanitize: true });
-    return { __html: mdHtml };
+    console.log(e)
+    this.props.dispatch(push("/test"));
   }
 
   render() {
+    const content = this.props.posts.map((post) => (
+      <Card
+        key={post.get("id")}
+        className="card_block__item"
+        onClick={(e) => this.clickOnCard(e)}
+      >
+        <Card.Content>
+          <Card.Header>
+            {post.get('header')}
+          </Card.Header>
+          <Card.Description>
+            {post.get('content')}
+          </Card.Description>
+        </Card.Content>
+      </Card>
+    ));
+
     return (
       <div>
         <Panel />
-        <Grid
-          columns={2}
-          padded="vertically"
-          centered={!this.state.isSplitMode}
-        >
-          <Grid.Row>
-            <Grid.Column>
-              <Segment>
-                <article>
-                  <header>
-                    <h1 className="article__h1">{this.state.firstNote.header}</h1>
-                    <a
-                      className="article__edit"
-                      href="#edit"
-                      onClick={(e) => this.handleClickEdit(e)}
-                    >
-                      { this.state.isEditMode ? 'done' : 'edit' }
-                    </a>
-                  </header>
-                  { this.state.isEditMode ? (
-                      <Form>
-                        <TextArea
-                          autoHeight
-                          value={this.state.firstNote.text}
-                          onChange={(e) => this.handleEdit(e)}
-                        />
-                      </Form>
-                    ) : (
-                      <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
-                    )
-                }
-                </article>
-              </Segment>
-            </Grid.Column>
-            { this.state.isSplitMode ?
-              (
-                <Grid.Column>
-                  { this.state.isEditMode ? (
-                      <Segment>
-                        <article>
-                          <h1>{this.state.firstNote.header}</h1>
-                          <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
-                        </article>
-                      </Segment>
-                    ) : (
-                      <Segment>
-                        <article>
-                          <h1>{this.state.secondNote.header}</h1>
-                          <p dangerouslySetInnerHTML={this.markedText(this.state.secondNote.text)}></p>
-                        </article>
-                      </Segment>
-                    )
-                  }
-                </Grid.Column>
-              ) : null
-            }
-          </Grid.Row>
-        </Grid>
+        <Container>
+          <div className="card_block">
+            {content}
+          </div>
+        </Container>
       </div>
     );
   }
 }
+
+HomePage.propTypes = {
+  posts: PropTypes.object.isRequired,
+  loggedIn: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => (
+  {
+    posts: makeSelectPosts(state),
+    loggedIn: makeSelectLoggedIn(state),
+  }
+);
+
+const mapDispatchToProps = (dispatch) => ({ dispatch });
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

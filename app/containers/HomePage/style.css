@@ -1,7 +1,19 @@
-.article__h1 {
-  display: inline-block;
+.card_block {
+  display: flex;
+  flex-flow: row-reverse wrap;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
-.article__edit {
-  margin-left: 1rem;
+.card_block__item {
+  flex: 0 1 22%;
+  margin-left: auto;
+  height: 14rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Semantic UI fix */
+.ui.card:first-child {
+  margin-top: auto !important;
 }
