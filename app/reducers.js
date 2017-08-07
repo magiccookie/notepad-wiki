@@ -41,11 +41,24 @@ function routeReducer(state = routeInitialState, action) {
 /**
  * Creates the main reducer with the asynchronously loaded ones
  */
+
+import { LOG_OUT } from 'reducers/Auth/constants';
+
+const appReducer = (asyncReducers) => combineReducers({
+  route: routeReducer,
+  language: languageProviderReducer,
+  auth: authReducer,
+  ...asyncReducers,
+});
+
+const rootReducer = (asyncReducers) => (state, action) => {
+  if (action.type === LOG_OUT) {
+    state = undefined
+  }
+
+  return appReducer(asyncReducers)(state, action);
+}
+
 export default function createReducer(asyncReducers) {
-  return combineReducers({
-    route: routeReducer,
-    language: languageProviderReducer,
-    auth: authReducer,
-    ...asyncReducers,
-  });
+  return rootReducer(asyncReducers);
 }
