@@ -7,7 +7,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
-import { push } from 'react-router-redux';
 
 import {
   makeSelectLoggedIn,
@@ -35,7 +34,7 @@ class LoginButton extends React.Component { // eslint-disable-line react/prefer-
   logOut = (e) => {
     e.preventDefault();
     this.props.dispatch(logOut());
-  };
+  }
 
   render() {
     return (

@@ -14,6 +14,7 @@ import {
   wipeTmpCredits,
   wipeAuthState,
 } from '../../reducers/Auth/actions';
+import { push } from 'react-router-redux';
 
 import {
   makeSelectTmpCredits,
@@ -68,6 +69,7 @@ function* authLogOut() {
   }
 
   yield put(wipeAuthState());
+  yield put(push('/'));
 }
 
 function* signIn() {
