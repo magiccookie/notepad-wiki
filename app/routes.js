@@ -1,4 +1,5 @@
 import { getAsyncInjectors } from 'utils/asyncInjectors';
+import { requireAuth } from './requireAuth';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -15,12 +16,13 @@ export default function createRoutes(store) {
   const childRoutes = [
     {
       path: '/',
-      name: 'home',
+      name: 'userhome',
+      onEnter: requireAuth(store),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/HomePage/reducer'),
-          import('containers/HomePage/sagas'),
-          import('containers/HomePage'),
+          import('containers/UserHome/reducer'),
+          import('containers/UserHome/sagas'),
+          import('containers/UserHome'),
         ]);
 
         const renderRoute = loadModule(cb);
@@ -62,7 +64,7 @@ export default function createRoutes(store) {
         const renderRoute = loadModule(cb);
 
         importModules.then(([reducer, sagas, component]) => {
-          injectReducer('signUpForm', reducer.default);
+          injectReducer('signup', reducer.default);
           injectSagas(sagas.default);
           renderRoute(component);
         });
