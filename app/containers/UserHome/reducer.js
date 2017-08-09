@@ -1,6 +1,6 @@
 /*
  *
- * HomePage reducer
+ * UserHome reducer
  *
  */
 

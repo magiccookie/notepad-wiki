@@ -1,6 +1,6 @@
 /*
  *
- * HomePage actions
+ * UserHome actions
  *
  */
 

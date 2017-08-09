@@ -13,11 +13,13 @@ import { fetchPosts } from 'utils/request';
 function* fetchPostsTask() {
   const token = localStorage.getItem('jwt-token');
 
-  try {
-    const result = yield call(fetchPosts, token);
-    yield put(fetchSuccess(result));
-  } catch (err) {
-    yield put(fetchError(err));
+  if (token) {
+    try {
+      const result = yield call(fetchPosts, token);
+      yield put(fetchSuccess(result));
+    } catch (err) {
+      yield put(fetchError(err));
+    }
   }
 }
 

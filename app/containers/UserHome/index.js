@@ -1,5 +1,6 @@
 /*
- * HomePage
+ *
+ * UserHome
  *
  */
 
@@ -16,12 +17,7 @@ import { getLatestPosts } from './actions';
 import Panel from '../../components/Panel';
 import './style.css';
 
-class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
+class UserHome extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.dispatch(getLatestPosts());
@@ -64,7 +60,7 @@ class HomePage extends React.PureComponent { // eslint-disable-line react/prefer
   }
 }
 
-HomePage.propTypes = {
+UserHome.propTypes = {
   posts: PropTypes.object.isRequired,
   loggedIn: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
@@ -79,4 +75,4 @@ const mapStateToProps = (state) => (
 
 const mapDispatchToProps = (dispatch) => ({ dispatch });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default connect(mapStateToProps, mapDispatchToProps)(UserHome);

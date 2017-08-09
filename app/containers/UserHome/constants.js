@@ -1,6 +1,6 @@
 /*
  *
- * HomePage constants
+ * UserHome constants
  *
  */
 
