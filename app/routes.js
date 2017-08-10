@@ -72,7 +72,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/:article',
+      path: '/note/:note',
       name: 'docview',
       getComponent(nextState, cb) {
         const importModules = Promise.all([

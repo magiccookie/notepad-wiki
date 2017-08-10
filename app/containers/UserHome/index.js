@@ -15,6 +15,8 @@ import { makeSelectPosts } from './selectors';
 import { getLatestPosts } from './actions';
 
 import Panel from '../../components/Panel';
+import { headerToUrl } from '../../utils/helpers';
+
 import './style.css';
 
 class UserHome extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -23,10 +25,17 @@ class UserHome extends React.PureComponent { // eslint-disable-line react/prefer
     this.props.dispatch(getLatestPosts());
   }
 
-  clickOnCard = (e) => {
-    e.preventDefault();
-    console.log(e)
-    this.props.dispatch(push("/test"));
+  clickOnCard = (index, e) => {
+    console.log("index", index)
+    this.props.posts.map((post) => {
+      if (index === post.get("id"))  {
+        const header = headerToUrl(post.get("header"));
+        const url = `/note/${header}/`
+        this.props.dispatch(push(url));
+      } else {
+        return;
+      }
+    });
   }
 
   render() {
@@ -34,7 +43,7 @@ class UserHome extends React.PureComponent { // eslint-disable-line react/prefer
       <Card
         key={post.get("id")}
         className="card_block__item"
-        onClick={(e) => this.clickOnCard(e)}
+        onClick={(e) => this.clickOnCard(post.get("id"), e)}
       >
         <Card.Content>
           <Card.Header>
