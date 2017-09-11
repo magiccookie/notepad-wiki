@@ -37,6 +37,22 @@ export function fetchPosts(token) {
     .then(toImmutable);
 }
 
+const takeFirst = (data) => data.get('0');
+
+export function fetchNote(noteName, token) {
+  return fetch(`/api/posts?name=${noteName}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable)
+    .then(takeFirst);
+}
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',

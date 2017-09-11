@@ -1,37 +1,43 @@
 /*
- * HomePage
+ *
+ * DocView
  *
  */
 
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Container, Form, Grid, Segment, TextArea } from 'semantic-ui-react';
+
+import { connect } from 'react-redux';
+import Helmet from 'react-helmet';
 import marked from 'marked';
 
 import Panel from '../../components/Panel';
+import {
+  selectActiveNote,
+  selectSecondaryNote,
+} from './selectors.js';
+
+import {
+  getNoteByName,
+  updateActiveNoteContent,
+} from './actions';
+
 import './style.css';
 
-import example from './example.md';
-
-export default class DocView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class DocView extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
-    this.note1 = {
-      text: example,
-      header: 'Header',
-    };
-
-    this.note2 = {
-      text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad beatae quam sequi, nihil perferendis illum doloribus asperiores molestias est, excepturi magni dolore voluptatem assumenda fugiat nulla tempora dicta quasi sunt.',
-      header: 'Secondary article',
-    };
-
     this.state = {
+      noteContentEditState: '',
       isSplitMode: false,
       isEditMode: false,
-      firstNote: this.note1,
-      secondNote: this.note2,
     };
+  }
+
+  componentWillMount() {
+    const noteName = this.props.params.note;
+    this.props.dispatch(getNoteByName(noteName));
   }
 
   toggleSplitMode = () => {
@@ -40,9 +46,14 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
   }
 
   toggleEditMode = () => {
-    const curEdit = this.state.isEditMode;
-    const curSplit = curEdit;
-    this.setState({ isSplitMode: !curSplit, isEditMode: !curEdit });
+    const nextEditMode = !this.state.isEditMode;
+    const nextSplitMode = nextEditMode;
+    const noteContentEditState = nextEditMode ? this.props.activeNote.get("content") : '';
+    this.setState({
+      isSplitMode: nextSplitMode,
+      isEditMode: nextEditMode,
+      noteContentEditState: noteContentEditState,
+    });
   }
 
   handleClickLink = (e) => {
@@ -56,12 +67,13 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
   }
 
   handleEdit = (e) => {
-    const newNote = { ...this.state.firstNote, text: e.target.value };
-    this.setState({ firstNote: newNote });
+    const noteContentEditState = e.target.value;
+    this.setState({ noteContentEditState });
+    this.props.dispatch(updateActiveNoteContent(noteContentEditState));
   }
 
   markedText = (text) => {
-    const mdHtml = marked(text, { sanitize: true });
+    const mdHtml = marked(text || '', { sanitize: true });
     return { __html: mdHtml };
   }
 
@@ -80,7 +92,7 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
                 <Segment>
                   <article>
                     <header>
-                      <h1 className="article__h1">{this.state.firstNote.header}</h1>
+                      <h1 className="article__h1">{this.props.activeNote.get("header")}</h1>
                       <a
                         className="article__edit"
                         href="#edit"
@@ -93,12 +105,12 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
                         <Form>
                           <TextArea
                             autoHeight
-                            value={this.state.firstNote.text}
+                            value={this.state.noteContentEditState}
                             onChange={(e) => this.handleEdit(e)}
                           />
                         </Form>
                       ) : (
-                        <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
+                        <p dangerouslySetInnerHTML={this.markedText(this.props.activeNote.get("content"))}></p>
                       )
                     }
                   </article>
@@ -110,15 +122,15 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
                     { this.state.isEditMode ? (
                         <Segment>
                           <article>
-                            <h1>{this.state.firstNote.header}</h1>
-                            <p dangerouslySetInnerHTML={this.markedText(this.state.firstNote.text)}></p>
+                            <h1>{this.props.activeNote.get("header")}</h1>
+                            <p dangerouslySetInnerHTML={this.markedText(this.props.activeNote.get("content"))}></p>
                           </article>
                         </Segment>
                       ) : (
                         <Segment>
                           <article>
-                            <h1>{this.state.secondNote.header}</h1>
-                            <p dangerouslySetInnerHTML={this.markedText(this.state.secondNote.text)}></p>
+                            <h1>{this.props.secondaryNote.get("header")}</h1>
+                            <p dangerouslySetInnerHTML={this.markedText(this.props.secondaryNote.get("content"))}></p>
                           </article>
                         </Segment>
                       )
@@ -133,3 +145,20 @@ export default class DocView extends React.PureComponent { // eslint-disable-lin
     );
   }
 }
+
+DocView.propTypes = {
+  activeNote: PropTypes.object.isRequired,
+  secondaryNote: PropTypes.object.isRequired,
+  dispatch: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => (
+  {
+    activeNote: selectActiveNote(state),
+    secondaryNote: selectSecondaryNote(state),
+  }
+);
+
+const mapDispatchToProps = (dispatch) => ({ dispatch });
+
+export default connect(mapStateToProps, mapDispatchToProps)(DocView);
