@@ -10,7 +10,6 @@ const loadModule = (cb) => (componentModule) => {
 };
 
 export default function createRoutes(store) {
-
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
 
   const childRoutes = [
@@ -74,14 +73,19 @@ export default function createRoutes(store) {
     }, {
       path: '/note/:note',
       name: 'docview',
+      onEnter: requireAuth(store),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
+          import('containers/DocView/reducer'),
+          import('containers/DocView/sagas'),
           import('containers/DocView'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('docview', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
