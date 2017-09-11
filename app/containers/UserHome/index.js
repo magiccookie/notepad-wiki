@@ -26,7 +26,6 @@ class UserHome extends React.PureComponent { // eslint-disable-line react/prefer
   }
 
   clickOnCard = (index, e) => {
-    console.log("index", index)
     this.props.posts.map((post) => {
       if (index === post.get("id"))  {
         const header = headerToUrl(post.get("header"));
