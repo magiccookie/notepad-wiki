@@ -23,5 +23,5 @@ export function fetchSuccess(posts) {
 
 export function fetchError(posts) {
   console.log('Posts fetch error');
-  return ;
+  return { type: 'ERROR' };
 }
