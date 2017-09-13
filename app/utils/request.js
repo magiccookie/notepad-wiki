@@ -53,6 +53,19 @@ export function fetchNote(noteName, token) {
     .then(takeFirst);
 }
 
+export function modifyNote(note, token) {
+  return fetch(`/api/posts/${note.get("id")}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+    body: JSON.stringify(note.toJS()),
+  })
+    .then(checkStatus)
+    .then(parseJSON);
+}
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',

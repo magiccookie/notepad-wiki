@@ -16,3 +16,13 @@ export function fetchError(err) {
   console.log("fetch note error", err);
   return { type: 'ERROR' };
 }
+
+export function modifySuccess(r) {
+  console.log("modifySuccess", r);
+  return { type: 'REPORT', payload: r };
+}
+
+export function modifyError(err) {
+  console.log("modifyError", err);
+  return { type: 'ERROR' };
+}

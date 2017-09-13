@@ -1,14 +1,11 @@
+import { delay } from 'redux-saga';
 import { take, call, cancel, put, select, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
+
 import * as c from './constants'
-
-import {
-  getNoteByName,
-  fetchSuccess,
-  fetchError,
-} from './actions';
-
-import { fetchNote } from 'utils/request';
+import * as a from './actions';
+import * as s from './selectors';
+import * as r from 'utils/request';
 
 function* fetchNoteTask(action) {
   const token = localStorage.getItem('jwt-token');
@@ -16,10 +13,29 @@ function* fetchNoteTask(action) {
 
   if (token) {
     try {
-      const result = yield call(fetchNote, noteName, token);
-      yield put(fetchSuccess(result));
+      const result = yield call(r.fetchNote, noteName, token);
+      yield put(a.fetchSuccess(result));
     } catch (err) {
-      yield put(fetchError(err));
+      yield put(a.fetchError(err));
+    }
+  }
+}
+
+
+function* modifyNoteTask() {
+  // debounce by 500ms
+  const interval = 500;
+  yield call(delay, interval);
+
+  const token = localStorage.getItem('jwt-token');
+  const note = yield select(s.selectActiveNote);
+
+  if (token) {
+    try {
+      const result = yield call(r.modifyNote, note, token);
+      yield put(a.modifySuccess(result));
+    } catch (err) {
+      yield put(a.modifyError(err));
     }
   }
 }
@@ -30,6 +46,13 @@ function* getNoteWatcher() {
   yield cancel(watcher);
 }
 
+function* modifyNoteWatcher() {
+  const watcher = yield takeLatest(c.UPDATE_ACTIVE_NOTE_CONTENT, modifyNoteTask);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export default [
   getNoteWatcher,
+  modifyNoteWatcher,
 ];
