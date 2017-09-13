@@ -11,6 +11,7 @@ import {
   WIPE_AUTH_STATE,
   CHECK_AUTH,
   LOG_OUT,
+  UNAUTHORIZED
 } from './constants';
 
 export function Authorize(tmpCredits) {
@@ -45,7 +46,7 @@ export function authSuccess(authState) {
 
 export function authError(err) {
   console.log('Login error: ', err);
-  return { type: WIPE_AUTH_STATE };
+  return { type: UNAUTHORIZED };
 }
 
 export function wipeTmpCredits() {

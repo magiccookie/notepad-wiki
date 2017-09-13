@@ -1,9 +1,6 @@
-import { makeSelectLoggedIn } from './reducers/Auth/selectors';
-
 export const requireAuth = (store) => (nextState, replace) => {
-  const state = store.getState();
-  const loggedIn = makeSelectLoggedIn(state);
-  if (!loggedIn) {
+  const token = localStorage.getItem('jwt-token');
+  if (!token) {
     replace('/login/');
   }
 }

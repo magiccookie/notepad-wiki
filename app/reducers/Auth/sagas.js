@@ -6,6 +6,7 @@ import {
   AUTHORIZE,
   CHECK_AUTH,
   LOG_OUT,
+  UNAUTHORIZED
 } from '../../reducers/Auth/constants';
 
 import {
@@ -72,6 +73,15 @@ function* authLogOut() {
   yield put(push('/'));
 }
 
+function* unauthorizedTask() {
+  if (localStorage.getItem('jwt-token')) {
+    localStorage.removeItem('jwt-token');
+  }
+
+  yield put(wipeAuthState());
+  yield put(push('/login/'));
+}
+
 function* signIn() {
   const watcher = yield takeLatest(AUTHORIZE, authWithCredits);
   yield take(LOCATION_CHANGE);
@@ -90,8 +100,15 @@ function* checkAuth() {
   yield cancel(watcher);
 }
 
+function* Unauthorized() {
+  const watcher = yield takeLatest(UNAUTHORIZED, unauthorizedTask);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export default [
   signIn,
   logOut,
   checkAuth,
+  Unauthorized,
 ];
