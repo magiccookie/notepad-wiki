@@ -12,15 +12,9 @@ import Helmet from 'react-helmet';
 import marked from 'marked';
 
 import Panel from '../../components/Panel';
-import {
-  selectActiveNote,
-  selectSecondaryNote,
-} from './selectors.js';
 
-import {
-  getNoteByName,
-  updateActiveNoteContent,
-} from './actions';
+import * as a from './actions';
+import * as s from './selectors';
 
 import './style.css';
 
@@ -37,7 +31,7 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
 
   componentWillMount() {
     const noteName = this.props.params.note;
-    this.props.dispatch(getNoteByName(noteName));
+    this.props.dispatch(a.getNoteByName(noteName));
   }
 
   toggleSplitMode = () => {
@@ -69,7 +63,7 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   handleEdit = (e) => {
     const noteContentEditState = e.target.value;
     this.setState({ noteContentEditState });
-    this.props.dispatch(updateActiveNoteContent(noteContentEditState));
+    this.props.dispatch(a.updateActiveNoteContent(noteContentEditState));
   }
 
   markedText = (text) => {
@@ -154,8 +148,8 @@ DocView.propTypes = {
 
 const mapStateToProps = (state) => (
   {
-    activeNote: selectActiveNote(state),
-    secondaryNote: selectSecondaryNote(state),
+    activeNote: s.selectActiveNote(state),
+    secondaryNote: s.selectSecondaryNote(state),
   }
 );
 

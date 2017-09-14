@@ -1,6 +1,7 @@
 import { delay } from 'redux-saga';
 import { take, call, cancel, put, select, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import { push } from 'react-router-redux';
 
 import * as c from './constants'
 import * as a from './actions';
@@ -40,6 +41,10 @@ function* modifyNoteTask() {
   }
 }
 
+function* errorTask() {
+  yield put(push('/'));
+}
+
 function* getNoteWatcher() {
   const watcher = yield takeLatest(c.GET_NOTE, fetchNoteTask);
   yield take(LOCATION_CHANGE);
@@ -52,7 +57,14 @@ function* modifyNoteWatcher() {
   yield cancel(watcher);
 }
 
+function* errorWatcher() {
+  const watcher = yield takeLatest(c.FETCH_NOTE_ERROR, errorTask);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export default [
   getNoteWatcher,
   modifyNoteWatcher,
+  errorWatcher,
 ];

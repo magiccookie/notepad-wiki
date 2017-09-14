@@ -14,7 +14,7 @@ export function fetchSuccess(result) {
 
 export function fetchError(err) {
   console.log("fetch note error", err);
-  return { type: 'ERROR' };
+  return { type: c.FETCH_NOTE_ERROR };
 }
 
 export function modifySuccess(r) {

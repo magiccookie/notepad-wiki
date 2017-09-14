@@ -22,7 +22,18 @@ function checkStatus(response) {
   throw error;
 }
 
+function validData(data) {
+  if (data) {
+    return data;
+  }
+
+  const error = new Error("data is not valid");
+  error.response = data;
+  throw error;
+}
+
 const toImmutable = (data) => fromJS(data);
+const takeFirst = (data) => data.get('0');
 
 export function fetchPosts(token) {
   return fetch('/api/posts', {
@@ -37,7 +48,6 @@ export function fetchPosts(token) {
     .then(toImmutable);
 }
 
-const takeFirst = (data) => data.get('0');
 
 export function fetchNote(noteName, token) {
   return fetch(`/api/posts?name=${noteName}`, {
@@ -50,7 +60,8 @@ export function fetchNote(noteName, token) {
     .then(checkStatus)
     .then(parseJSON)
     .then(toImmutable)
-    .then(takeFirst);
+    .then(takeFirst)
+    .then(validData);
 }
 
 export function modifyNote(note, token) {
