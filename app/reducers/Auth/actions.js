@@ -31,7 +31,7 @@ export function changeAuthState(authState) {
 export function authSuccess(authState) {
   console.log('Login success: ', authState);
   return {
-    type: CHANGE_AUTH_STATE,
+    type: c.CHANGE_AUTH_STATE,
     payload: { loggedIn: true, profile: authState },
   };
 }
