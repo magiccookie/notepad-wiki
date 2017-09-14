@@ -1,5 +1,9 @@
 import * as c from './constants';
 
+export function updateActiveNoteHeader(header) {
+  return { type: c.UPDATE_ACTIVE_NOTE_HEADER, payload: header };
+}
+
 export function updateActiveNoteContent(content) {
   return { type: c.UPDATE_ACTIVE_NOTE_CONTENT, payload: content };
 }

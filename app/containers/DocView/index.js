@@ -5,7 +5,7 @@
  */
 
 import React, { PropTypes } from 'react';
-import { Container, Form, Grid, Segment, TextArea } from 'semantic-ui-react';
+import { Container, Form, Grid, Input, Segment, TextArea } from 'semantic-ui-react';
 
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
@@ -23,6 +23,7 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   constructor(props) {
     super(props);
     this.state = {
+      noteHeaderEditState: '',
       noteContentEditState: '',
       isSplitMode: false,
       isEditMode: false,
@@ -42,11 +43,13 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   toggleEditMode = () => {
     const nextEditMode = !this.state.isEditMode;
     const nextSplitMode = nextEditMode;
+    const noteHeaderEditState = nextEditMode ? this.props.activeNote.get("header") : '';
     const noteContentEditState = nextEditMode ? this.props.activeNote.get("content") : '';
     this.setState({
+      noteContentEditState: noteContentEditState,
+      noteHeaderEditState: noteHeaderEditState,
       isSplitMode: nextSplitMode,
       isEditMode: nextEditMode,
-      noteContentEditState: noteContentEditState,
     });
   }
 
@@ -64,6 +67,12 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
     const noteContentEditState = e.target.value;
     this.setState({ noteContentEditState });
     this.props.dispatch(a.updateActiveNoteContent(noteContentEditState));
+  }
+
+  handleHeaderEdit = (e) => {
+    const noteHeaderEditState = e.target.value;
+    this.setState({ noteHeaderEditState });
+    this.props.dispatch(a.updateActiveNoteHeader(noteHeaderEditState));
   }
 
   markedText = (text) => {
@@ -84,9 +93,14 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
             <Grid.Row>
               <Grid.Column>
                 <Segment>
+                  { this.state.isEditMode ? (
                   <article>
                     <header>
-                      <h1 className="article__h1">{this.props.activeNote.get("header")}</h1>
+                      <Input
+                        type="text"
+                        value={this.state.noteHeaderEditState}
+                        onChange={this.handleHeaderEdit}
+                      />
                       <a
                         className="article__edit"
                         href="#edit"
@@ -95,19 +109,30 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
                         { this.state.isEditMode ? 'done' : 'edit' }
                       </a>
                     </header>
-                    { this.state.isEditMode ? (
-                        <Form>
-                          <TextArea
-                            autoHeight
-                            value={this.state.noteContentEditState}
-                            onChange={(e) => this.handleEdit(e)}
-                          />
-                        </Form>
-                      ) : (
+                    <Form>
+                      <TextArea
+                        autoHeight
+                        value={this.state.noteContentEditState}
+                        onChange={this.handleEdit}
+                      />
+                    </Form>
+                  </article>
+                  ) : (
+                    <article>
+                        <header>
+                          <h1 className="article__h1">{this.props.activeNote.get("header")}</h1>
+                          <a
+                            className="article__edit"
+                            href="#edit"
+                            onClick={(e) => this.handleClickEdit(e)}
+                          >
+                            { this.state.isEditMode ? 'done' : 'edit' }
+                          </a>
+                        </header>
                         <p dangerouslySetInnerHTML={this.markedText(this.props.activeNote.get("content"))}></p>
+                      </article>
                       )
                     }
-                  </article>
                 </Segment>
               </Grid.Column>
               { this.state.isSplitMode ?

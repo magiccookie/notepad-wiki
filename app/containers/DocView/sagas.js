@@ -22,7 +22,6 @@ function* fetchNoteTask(action) {
   }
 }
 
-
 function* modifyNoteTask() {
   // debounce by 500ms
   const interval = 500;
@@ -52,7 +51,7 @@ function* getNoteWatcher() {
 }
 
 function* modifyNoteWatcher() {
-  const watcher = yield takeLatest(c.UPDATE_ACTIVE_NOTE_CONTENT, modifyNoteTask);
+  const watcher = yield takeLatest([c.UPDATE_ACTIVE_NOTE_CONTENT, c.UPDATE_ACTIVE_NOTE_HEADER], modifyNoteTask);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
