@@ -1,60 +1,44 @@
 import { take, call, cancel, put, select, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
-import { fromJS } from 'immutable';
-
-import {
-  AUTHORIZE,
-  CHECK_AUTH,
-  LOG_OUT,
-  UNAUTHORIZED
-} from '../../reducers/Auth/constants';
-
-import {
-  authSuccess,
-  authError,
-  wipeAuthState,
-} from '../../reducers/Auth/actions';
 import { push } from 'react-router-redux';
 
-import {
-  makeSelectLoggedIn,
-} from '../../reducers/Auth/selectors';
+import { fromJS } from 'immutable';
 
-import {
-  requestAuth,
-  requestCheckUser,
-} from 'utils/request';
+import * as c from './constants';
+import * as a from './actions';
+import * as s from './selectors';
+import * as r from 'utils/request';
 
 function* authWithCredits(action) {
   const credits = action.payload;
 
   try {
-    const result = yield call(requestAuth, credits);
+    const result = yield call(r.requestAuth, credits);
 
     const token = result.get('token');
     const payload = fromJS(JSON.parse(atob(token.split('.')[1])));
-    yield put(authSuccess(payload));
+    yield put(a.authSuccess(payload));
 
     localStorage.setItem('jwt-token', token);
 
   } catch (err) {
-    yield put(authError(err));
+    yield put(a.authError(err));
   }
 }
 
 function* authWithToken() {
-  const loggedIn = yield select(makeSelectLoggedIn);
+  const loggedIn = yield select(s.makeSelectLoggedIn);
 
   if (!loggedIn) {
     const token = localStorage.getItem('jwt-token');
     if (token) {
       try {
-        const result = yield call(requestCheckUser, token);
+        const result = yield call(r.requestCheckUser, token);
         console.log('result ', result);
         const payload = result;
-        yield put(authSuccess(payload));
+        yield put(a.authSuccess(payload));
       } catch (err) {
-        yield put(authError(err));
+        yield put(a.authError(err));
       }
     }
   }
@@ -65,7 +49,7 @@ function* authLogOut() {
     localStorage.removeItem('jwt-token');
   }
 
-  yield put(wipeAuthState());
+  yield put(a.wipeAuthState());
   yield put(push('/'));
 }
 
@@ -74,30 +58,30 @@ function* unauthorizedTask() {
     localStorage.removeItem('jwt-token');
   }
 
-  yield put(wipeAuthState());
+  yield put(a.wipeAuthState());
   yield put(push('/login/'));
 }
 
 function* signIn() {
-  const watcher = yield takeLatest(AUTHORIZE, authWithCredits);
+  const watcher = yield takeLatest(c.AUTHORIZE, authWithCredits);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
 function* logOut() {
-  const watcher = yield takeLatest(LOG_OUT, authLogOut);
+  const watcher = yield takeLatest(c.LOG_OUT, authLogOut);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
 function* checkAuth() {
-  const watcher = yield takeLatest(CHECK_AUTH, authWithToken);
+  const watcher = yield takeLatest(c.CHECK_AUTH, authWithToken);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
 
 function* Unauthorized() {
-  const watcher = yield takeLatest(UNAUTHORIZED, unauthorizedTask);
+  const watcher = yield takeLatest(c.UNAUTHORIZED, unauthorizedTask);
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
 }
