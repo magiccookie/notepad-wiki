@@ -15,11 +15,10 @@ import { makeSelectPosts } from './selectors';
 import { getLatestPosts } from './actions';
 
 import Panel from '../../components/Panel';
-import { headerToUrl } from '../../utils/helpers';
 
 import './style.css';
 
-class UserHome extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class UserHome extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
     this.props.dispatch(getLatestPosts());
@@ -28,8 +27,7 @@ class UserHome extends React.PureComponent { // eslint-disable-line react/prefer
   clickOnCard = (index, e) => {
     this.props.posts.map((post) => {
       if (index === post.get("id"))  {
-        const header = headerToUrl(post.get("header"));
-        const url = `/note/${header}/`
+        const url = `/note/${post.get("name")}/`
         this.props.dispatch(push(url));
       } else {
         return;
