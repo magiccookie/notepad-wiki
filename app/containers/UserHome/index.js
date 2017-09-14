@@ -5,7 +5,7 @@
  */
 
 import React, { PropTypes } from 'react';
-import { Card, Container } from 'semantic-ui-react';
+import { Button, Card, Container, Icon } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
@@ -35,6 +35,10 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
     });
   }
 
+  addNew = () => {
+    console.log('click');
+  }
+
   render() {
     const content = this.props.posts.map((post) => (
       <Card
@@ -53,11 +57,26 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
       </Card>
     ));
 
+    const addButton = (
+      <div className="ui card card_block__item">
+        <Button
+          className="card_block__button"
+          color="blue"
+          size="huge"
+          onClick={this.addNew}
+        >
+          <Icon name="pencil" />
+          add new note
+        </Button>
+      </div>
+    );
+
     return (
       <div>
         <Panel />
         <Container>
           <div className="card_block">
+            {addButton}
             {content}
           </div>
         </Container>

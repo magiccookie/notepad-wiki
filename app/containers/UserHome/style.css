@@ -13,6 +13,10 @@
   overflow: hidden;
 }
 
+.card_block__button {
+  height: 14em;
+}
+
 /* Semantic UI fix */
 .ui.card:first-child {
   margin-top: auto !important;
