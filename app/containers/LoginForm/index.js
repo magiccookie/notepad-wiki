@@ -41,8 +41,6 @@ export class LoginForm extends React.Component { // eslint-disable-line react/pr
 
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log(`A value to submit: ${JSON.stringify(this.state)}`);
-
     if (this.state.username && this.state.password) {
       this.props.dispatch(Authorize(this.state));
       this.setState({ username: '', password: '' });

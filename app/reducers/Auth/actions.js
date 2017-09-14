@@ -6,7 +6,6 @@
 
 import {
   AUTHORIZE,
-  WIPE_TMP_CREDITS,
   CHANGE_AUTH_STATE,
   WIPE_AUTH_STATE,
   CHECK_AUTH,
@@ -14,10 +13,10 @@ import {
   UNAUTHORIZED
 } from './constants';
 
-export function Authorize(tmpCredits) {
+export function Authorize(authCredits) {
   return {
     type: AUTHORIZE,
-    payload: tmpCredits,
+    payload: authCredits,
   };
 }
 
@@ -47,10 +46,6 @@ export function authSuccess(authState) {
 export function authError(err) {
   console.log('Login error: ', err);
   return { type: UNAUTHORIZED };
-}
-
-export function wipeTmpCredits() {
-  return { type: WIPE_TMP_CREDITS };
 }
 
 export function wipeAuthState() {

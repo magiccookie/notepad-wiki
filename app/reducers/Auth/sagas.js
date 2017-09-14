@@ -12,13 +12,11 @@ import {
 import {
   authSuccess,
   authError,
-  wipeTmpCredits,
   wipeAuthState,
 } from '../../reducers/Auth/actions';
 import { push } from 'react-router-redux';
 
 import {
-  makeSelectTmpCredits,
   makeSelectLoggedIn,
 } from '../../reducers/Auth/selectors';
 
@@ -27,13 +25,11 @@ import {
   requestCheckUser,
 } from 'utils/request';
 
-function* authWithCredits() {
-  const credits = yield select(makeSelectTmpCredits);
+function* authWithCredits(action) {
+  const credits = action.payload;
 
   try {
     const result = yield call(requestAuth, credits);
-    console.log('Auth action fired');
-    yield put(wipeTmpCredits());
 
     const token = result.get('token');
     const payload = fromJS(JSON.parse(atob(token.split('.')[1])));
