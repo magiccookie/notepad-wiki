@@ -25,13 +25,17 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
     this.state = {
       noteHeaderEditState: '',
       noteContentEditState: '',
+      noteHeaderCreateState: '',
+      noteContentCreateState: '',
       isSplitMode: false,
       isEditMode: false,
+      isCreateMode: false,
     };
   }
 
   componentWillMount() {
     if (this.props.route.name === 'create') {
+      this.setState({ isCreateMode: true });
       this.toggleEditMode();
     } else {
       const noteName = this.props.params.note;
@@ -62,6 +66,18 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
     this.toggleSplitMode();
   }
 
+  handleClickDone = (e) => {
+    e.preventDefault();
+    if (this.state.isCreateMode) {
+      const note = {
+        header: this.state.noteHeaderCreateState,
+        content: this.state.noteContentCreateState,
+      }
+      this.props.dispatch(a.saveNote(note));
+    }
+    this.toggleEditMode();
+  }
+
   handleClickEdit = (e) => {
     e.preventDefault();
     this.toggleEditMode();
@@ -70,13 +86,21 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   handleEdit = (e) => {
     const noteContentEditState = e.target.value;
     this.setState({ noteContentEditState });
-    this.props.dispatch(a.updateActiveNoteContent(noteContentEditState.trim()));
+    if (this.state.isCreateMode) {
+      this.setState({ noteContentCreateState: noteContentEditState.trim()})
+    } else {
+      this.props.dispatch(a.updateActiveNoteContent(noteContentEditState.trim()));
+    }
   }
 
   handleHeaderEdit = (e) => {
     const noteHeaderEditState = e.target.value;
     this.setState({ noteHeaderEditState });
-    this.props.dispatch(a.updateActiveNoteHeader(noteHeaderEditState.trim()));
+    if (this.state.isCreateMode) {
+      this.setState({ noteHeaderCreateState: noteHeaderEditState.trim()})
+    } else {
+      this.props.dispatch(a.updateActiveNoteHeader(noteHeaderEditState.trim()));
+    }
   }
 
   markedText = (text) => {
@@ -106,13 +130,25 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
                         value={this.state.noteHeaderEditState}
                         onChange={this.handleHeaderEdit}
                       />
-                      <a
-                        className="article__edit"
-                        href="#edit"
-                        onClick={(e) => this.handleClickEdit(e)}
-                      >
-                        { this.state.isEditMode ? 'done' : 'edit' }
-                      </a>
+                      { this.state.isEditMode ?
+                        (
+                          <a
+                            className="article__edit"
+                            href="#done"
+                            onClick={this.handleClickDone}
+                          >
+                            done
+                          </a>
+                        ) : (
+                          <a
+                            className="article__edit"
+                            href="#edit"
+                            onClick={his.handleClickEdit}
+                          >
+                            edit
+                          </a>
+                        )
+                      }
                     </header>
                     <Form>
                       <TextArea
@@ -145,10 +181,19 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
                   <Grid.Column>
                     { this.state.isEditMode ? (
                         <Segment>
-                          <article>
-                            <h1>{this.props.activeNote.get("header")}</h1>
-                            <p dangerouslySetInnerHTML={this.markedText(this.props.activeNote.get("content"))}></p>
-                          </article>
+                          { this.state.isCreateMode ?
+                            (
+                              <article>
+                                <h1>{this.state.noteHeaderCreateState}</h1>
+                                <p dangerouslySetInnerHTML={this.markedText(this.state.noteContentCreateState)}></p>
+                              </article>
+                            ) : (
+                              <article>
+                                <h1>{this.props.activeNote.get("header")}</h1>
+                                <p dangerouslySetInnerHTML={this.markedText(this.props.activeNote.get("content"))}></p>
+                              </article>
+                            )
+                          }
                         </Segment>
                       ) : (
                         <Segment>

@@ -11,3 +11,8 @@ export const selectSecondaryNote = createSelector(
   selectDocView,
   (docview) => docview.get('secondaryNote')
 );
+
+export const selectCreatedNote = createSelector(
+  selectDocView,
+  (docview) => docview.get('createdNote')
+);

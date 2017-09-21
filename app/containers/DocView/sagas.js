@@ -29,24 +29,29 @@ function* modifyNoteTask() {
 
   const token = localStorage.getItem('jwt-token');
   const note = yield select(s.selectActiveNote);
-  const note_id = note.get("id");
 
   if (token) {
-    if (note_id) {
-      try {
-        const result = yield call(r.modifyNote, note, token);
-        yield put(a.modifySuccess(result));
-      } catch (err) {
-        yield put(a.modifyError(err));
-      }
-    } else {
-      try {
-        const result = yield call(r.createNote, note, token);
-        yield put(a.createSuccess(result));
-        yield put(a.getNoteByName(result.get("name"))); // re-fetch new note
-      } catch (err) {
-        yield put(a.createError(err));
-      }
+    try {
+      const result = yield call(r.modifyNote, note, token);
+      yield put(a.modifySuccess(result));
+    } catch (err) {
+      yield put(a.modifyError(err));
+    }
+  }
+}
+
+function* saveNoteTask() {
+  const token = localStorage.getItem('jwt-token');
+  const note = yield select(s.selectCreatedNote);
+
+  if (token) {
+    try {
+      const result = yield call(r.createNote, note, token);
+      yield put(a.createSuccess(result));
+      yield put(push('/')); // hack due to https://github.com/ReactTraining/react-router/issues/4578
+      yield put(push(`/note/${result.get("name")}/`));
+    } catch (err) {
+      yield put(a.createError(err));
     }
   }
 }
@@ -71,6 +76,12 @@ function* modifyNoteWatcher() {
   yield cancel(watcher);
 }
 
+function* saveNoteWatcher() {
+  const watcher = yield takeLatest(c.SAVE_NOTE, saveNoteTask);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 function* errorWatcher() {
   const watcher = yield takeLatest(c.FETCH_NOTE_ERROR, errorTask);
   yield take(LOCATION_CHANGE);
@@ -87,6 +98,7 @@ function* resetWatcher() {
 export default [
   getNoteWatcher,
   modifyNoteWatcher,
+  saveNoteWatcher,
   errorWatcher,
   resetWatcher,
 ];

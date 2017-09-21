@@ -12,6 +12,10 @@ export function getNoteByName(noteName) {
   return { type: c.GET_NOTE, payload: noteName };
 }
 
+export function saveNote(note) {
+  return { type: c.SAVE_NOTE, payload: note };
+}
+
 export function resetState() {
   return { type: c.RESET };
 }
