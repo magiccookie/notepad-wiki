@@ -1,6 +1,7 @@
 import 'whatwg-fetch';
 import { fromJS } from 'immutable';
 
+
 function parseJSON(response) {
   const res = response.json();
   if (res) {
@@ -12,6 +13,7 @@ function parseJSON(response) {
   throw error;
 }
 
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -21,6 +23,7 @@ function checkStatus(response) {
   error.response = response;
   throw error;
 }
+
 
 function validData(data) {
   if (data) {
@@ -32,8 +35,10 @@ function validData(data) {
   throw error;
 }
 
+
 const toImmutable = (data) => fromJS(data);
 const takeFirst = (data) => data.get('0');
+
 
 export function fetchPosts(token) {
   return fetch('/api/posts', {
@@ -64,6 +69,22 @@ export function fetchNote(noteName, token) {
     .then(validData);
 }
 
+
+export function createNote(note, token) {
+  return fetch('/api/posts/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+    body: JSON.stringify(note.toJS()),
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}
+
+
 export function modifyNote(note, token) {
   return fetch(`/api/posts/${note.get("id")}`, {
     method: 'PUT',
@@ -74,8 +95,10 @@ export function modifyNote(note, token) {
     body: JSON.stringify(note.toJS()),
   })
     .then(checkStatus)
-    .then(parseJSON);
+    .then(parseJSON)
+    .then(toImmutable);
 }
+
 
 export function requestAuth(data) {
   return fetch('/api/token', {
@@ -87,6 +110,7 @@ export function requestAuth(data) {
     .then(parseJSON)
     .then(toImmutable);
 }
+
 
 export function requestCheckUser(token) {
   return fetch('/api/check', {

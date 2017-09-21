@@ -12,6 +12,10 @@ export function getNoteByName(noteName) {
   return { type: c.GET_NOTE, payload: noteName };
 }
 
+export function resetState() {
+  return { type: c.RESET };
+}
+
 export function fetchSuccess(result) {
   return { type: c.PUT_ACTIVE_NOTE, payload: result };
 }
@@ -19,6 +23,16 @@ export function fetchSuccess(result) {
 export function fetchError(err) {
   console.log("fetch note error", err);
   return { type: c.FETCH_NOTE_ERROR };
+}
+
+export function createSuccess(r) {
+  console.log("createSuccess", r);
+  return { type: 'REPORT', payload: r };
+}
+
+export function createError(err) {
+  console.log("createError", err);
+  return { type: 'ERROR' };
 }
 
 export function modifySuccess(r) {

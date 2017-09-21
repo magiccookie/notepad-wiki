@@ -31,8 +31,12 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   }
 
   componentWillMount() {
-    const noteName = this.props.params.note;
-    this.props.dispatch(a.getNoteByName(noteName));
+    if (this.props.route.name === 'create') {
+      this.toggleEditMode();
+    } else {
+      const noteName = this.props.params.note;
+      this.props.dispatch(a.getNoteByName(noteName));
+    }
   }
 
   toggleSplitMode = () => {
@@ -43,8 +47,8 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   toggleEditMode = () => {
     const nextEditMode = !this.state.isEditMode;
     const nextSplitMode = nextEditMode;
-    const noteHeaderEditState = nextEditMode ? this.props.activeNote.get("header") : '';
-    const noteContentEditState = nextEditMode ? this.props.activeNote.get("content") : '';
+    const noteHeaderEditState = nextEditMode ? this.props.activeNote.get("header") || '' : '';
+    const noteContentEditState = nextEditMode ? this.props.activeNote.get("content") || '': '';
     this.setState({
       noteContentEditState: noteContentEditState,
       noteHeaderEditState: noteHeaderEditState,
@@ -66,17 +70,18 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   handleEdit = (e) => {
     const noteContentEditState = e.target.value;
     this.setState({ noteContentEditState });
-    this.props.dispatch(a.updateActiveNoteContent(noteContentEditState));
+    this.props.dispatch(a.updateActiveNoteContent(noteContentEditState.trim()));
   }
 
   handleHeaderEdit = (e) => {
     const noteHeaderEditState = e.target.value;
     this.setState({ noteHeaderEditState });
-    this.props.dispatch(a.updateActiveNoteHeader(noteHeaderEditState));
+    this.props.dispatch(a.updateActiveNoteHeader(noteHeaderEditState.trim()));
   }
 
   markedText = (text) => {
-    const mdHtml = marked(text || '', { sanitize: true });
+    const t = text || '';
+    const mdHtml = marked(t, { sanitize: true });
     return { __html: mdHtml };
   }
 

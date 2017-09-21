@@ -36,7 +36,7 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   addNew = () => {
-    console.log('click');
+    this.props.dispatch(push('/create/'));
   }
 
   render() {

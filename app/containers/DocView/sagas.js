@@ -29,19 +29,34 @@ function* modifyNoteTask() {
 
   const token = localStorage.getItem('jwt-token');
   const note = yield select(s.selectActiveNote);
+  const note_id = note.get("id");
 
   if (token) {
-    try {
-      const result = yield call(r.modifyNote, note, token);
-      yield put(a.modifySuccess(result));
-    } catch (err) {
-      yield put(a.modifyError(err));
+    if (note_id) {
+      try {
+        const result = yield call(r.modifyNote, note, token);
+        yield put(a.modifySuccess(result));
+      } catch (err) {
+        yield put(a.modifyError(err));
+      }
+    } else {
+      try {
+        const result = yield call(r.createNote, note, token);
+        yield put(a.createSuccess(result));
+        yield put(a.getNoteByName(result.get("name"))); // re-fetch new note
+      } catch (err) {
+        yield put(a.createError(err));
+      }
     }
   }
 }
 
 function* errorTask() {
   yield put(push('/'));
+}
+
+function* resetTask() {
+  yield put(a.resetState());
 }
 
 function* getNoteWatcher() {
@@ -62,8 +77,16 @@ function* errorWatcher() {
   yield cancel(watcher);
 }
 
+function* resetWatcher() {
+  const watcher = yield takeLatest(LOCATION_CHANGE, resetTask);
+  yield take(LOCATION_CHANGE);
+  yield call(delay, 10); // silly hack
+  yield cancel(watcher);
+}
+
 export default [
   getNoteWatcher,
   modifyNoteWatcher,
   errorWatcher,
+  resetWatcher,
 ];
