@@ -36,7 +36,7 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const content = this.props.posts.map((post, index) => (
+    const content = this.props.posts.reverse().map((post, index) => (
       <Grid.Column>
         <Card
           key={post.get("id")}
