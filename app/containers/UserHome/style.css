@@ -1,33 +1,24 @@
-.card_block {
-  display: flex;
-  flex-flow: row-reverse wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.card_block__item {
-  flex: 0 1 22%;
-  margin-left: auto;
+.card_item {
   height: 14rem;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.card_block__button {
+.card_item__button {
   height: 14em;
 }
 
-.card_block__heading {
+.card_item__head {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
 }
-.card_block__header {
+.card_item__head-title {
   flex: 1;
 }
 
-.card_block__dropdown {
+.card_item__head-dropdown {
   flex: 0 1 auto;
 }
 
