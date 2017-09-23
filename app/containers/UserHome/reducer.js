@@ -6,9 +6,7 @@
 
 import { fromJS } from 'immutable';
 
-import {
-  PUT_LATEST_POSTS,
-} from './constants';
+import * as c from './constants';
 
 const initialState = fromJS({
   posts: [],
@@ -16,8 +14,10 @@ const initialState = fromJS({
 
 export function postsReducer(state = initialState, action) {
   switch (action.type) {
-    case PUT_LATEST_POSTS:
+    case c.PUT_LATEST_POSTS:
       return state.set('posts', action.payload);
+    case c.DELETE_NOTE:
+      return state.set('posts', state.get('posts').delete(action.index));
     default:
       return state;
   }

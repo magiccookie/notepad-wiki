@@ -100,6 +100,20 @@ export function modifyNote(note, token) {
 }
 
 
+export function deleteNote(id, token) {
+  return fetch(`/api/posts/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}
+
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',

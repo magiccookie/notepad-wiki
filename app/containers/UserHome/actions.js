@@ -4,21 +4,29 @@
  *
  */
 
-import {
-  GET_LATEST_POSTS,
-  PUT_LATEST_POSTS,
-} from './constants';
+import * as c from './constants';
+
+export function deleteNote(id, index) {
+  return { type: c.DELETE_NOTE, payload: id, index: index};
+}
+
+export function deleteSuccess(status) {
+  console.log('Post deleted');
+  return { type: 'REPORT', payload: status };
+}
+
+export function deleteError(err) {
+  console.log('Post delete error');
+  return { type: 'ERROR', payload: err };
+}
 
 export function getLatestPosts() {
-  return { type: GET_LATEST_POSTS };
+  return { type: c.GET_LATEST_POSTS };
 }
 
 export function fetchSuccess(posts) {
   console.log('Posts fetched');
-  return {
-    type: PUT_LATEST_POSTS,
-    payload: posts
-  };
+  return { type: c.PUT_LATEST_POSTS, payload: posts };
 }
 
 export function fetchError(posts) {

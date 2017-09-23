@@ -5,14 +5,12 @@
  */
 
 import React, { PropTypes } from 'react';
-import { Button, Card, Container, Icon } from 'semantic-ui-react';
+import { Button, Card, Container, Dropdown, Icon } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 
-import { makeSelectLoggedIn } from '../../reducers/Auth/selectors';
-import { makeSelectPosts } from './selectors';
-
-import { getLatestPosts } from './actions';
+import * as s from './selectors';
+import * as a from './actions';
 
 import Panel from '../../components/Panel';
 
@@ -21,18 +19,16 @@ import './style.css';
 class UserHome extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentWillMount() {
-    this.props.dispatch(getLatestPosts());
+    this.props.dispatch(a.getLatestPosts());
   }
 
-  clickOnCard = (index, e) => {
-    this.props.posts.map((post) => {
-      if (index === post.get("id"))  {
-        const url = `/note/${post.get("name")}/`
-        this.props.dispatch(push(url));
-      } else {
-        return;
-      }
-    });
+  clickOnCard = (name, e) => {
+    const url = `/note/${name}/`;
+    this.props.dispatch(push(url));
+  }
+
+  deleteNote = (id, index, e) => {
+    this.props.dispatch(a.deleteNote(id, index));
   }
 
   addNew = () => {
@@ -40,15 +36,31 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const content = this.props.posts.map((post) => (
+    const content = this.props.posts.map((post, index) => (
       <Card
         key={post.get("id")}
         className="card_block__item"
-        onClick={(e) => this.clickOnCard(post.get("id"), e)}
+        onClick={(e) => this.clickOnCard(post.get("name"), e)}
       >
         <Card.Content>
           <Card.Header>
-            {post.get('header')}
+            <div className="card_block__heading">
+              <Dropdown
+                className="card_block__dropdown"
+                icon="angle down"
+              >
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    onClick={(e) => this.deleteNote(post.get("id"), index, e)}
+                  >
+                    Delete
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              <div className="card_block__header">
+                {post.get('header')}
+              </div>
+            </div>
           </Card.Header>
           <Card.Description>
             {post.get('content')}
@@ -87,16 +99,10 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
 
 UserHome.propTypes = {
   posts: PropTypes.object.isRequired,
-  loggedIn: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => (
-  {
-    posts: makeSelectPosts(state),
-    loggedIn: makeSelectLoggedIn(state),
-  }
-);
+const mapStateToProps = (state) => ({posts: s.makeSelectPosts(state)});
 
 const mapDispatchToProps = (dispatch) => ({ dispatch });
 

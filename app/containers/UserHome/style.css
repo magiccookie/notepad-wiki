@@ -17,6 +17,20 @@
   height: 14em;
 }
 
+.card_block__heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.card_block__header {
+  flex: 1;
+}
+
+.card_block__dropdown {
+  flex: 0 1 auto;
+}
+
 /* Semantic UI fix */
 .ui.card:first-child {
   margin-top: auto !important;
