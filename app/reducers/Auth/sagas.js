@@ -49,7 +49,7 @@ function* authLogOut() {
   }
 
   yield put(a.wipeAuthState());
-  yield put(push('/'));
+  yield put(push('/login/'));
 }
 
 function* unauthorizedTask() {
