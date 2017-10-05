@@ -22,26 +22,27 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
     this.props.dispatch(a.getLatestPosts());
   }
 
-  clickOnCard = (name, e) => {
+  clickOnCard = (note, e) => {
+    const name = note.get("name");
     const url = `/note/${name}/`;
     this.props.dispatch(push(url));
   }
 
-  deleteNote = (id, index, e) => {
+  deleteNote = (note, index, e) => {
+    const id = note.get("id");
     this.props.dispatch(a.deleteNote(id, index));
   }
 
-  addNew = () => {
-    this.props.dispatch(push('/create/'));
-  }
+  addNew = () => this.props.dispatch(push('/create/'));
 
   render() {
-    const content = this.props.posts.reverse().map((post, index) => (
-      <Grid.Column>
+    const content = this.props.posts.reverse().map((note, index) => (
+      <Grid.Column
+        key={note.get("id")}
+      >
         <Card
-          key={post.get("id")}
           className="card_item"
-          onClick={(e) => this.clickOnCard(post.get("name"), e)}
+          onClick={(e) => this.clickOnCard(note, e)}
         >
           <Card.Content>
             <Card.Header>
@@ -52,19 +53,19 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
                 >
                   <Dropdown.Menu>
                     <Dropdown.Item
-                      onClick={(e) => this.deleteNote(post.get("id"), index, e)}
+                      onClick={(e) => this.deleteNote(note, index, e)}
                     >
                       Delete
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
                 <div className="card_item__head-title">
-                  {post.get('header')}
+                  {note.get('header')}
                 </div>
               </div>
             </Card.Header>
             <Card.Description>
-              {post.get('content')}
+              {note.get('content')}
             </Card.Description>
           </Card.Content>
         </Card>

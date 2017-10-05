@@ -34,7 +34,6 @@ function* authWithToken() {
     if (token) {
       try {
         const result = yield call(r.requestCheckUser, token);
-        console.log('result ', result);
         const payload = result;
         yield put(a.authSuccess(payload));
       } catch (err) {
