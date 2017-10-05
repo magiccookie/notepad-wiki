@@ -2,7 +2,6 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const jsonServer = require('json-server');
 
 const argv = require('minimist')(process.argv.slice(2));
 const setup = require('./middlewares/frontendMiddleware');
@@ -29,7 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
 if (isDev) {
-  const format = ':method :url :status :response-time ms - :res[content-length]'
+  const format = ':method :url :status :response-time ms - :res[content-length]';
   app.use(morgan(format));
 }
 
@@ -79,10 +78,25 @@ app.post("/api/token", (req, res) => {
   }
 });
 
-const mockServer = jsonServer.create();
-mockServer.use(jsonServer.defaults());
-mockServer.use(jsonServer.router('db.json'));
-app.use('/api', authCheck(), mockServer);
+if (isDev) {
+  const jsonServer = require('json-server');
+  const mockServer = jsonServer.create();
+  mockServer.use(jsonServer.defaults());
+  mockServer.use((req, res, next) => {
+    if (req.method === 'POST') {
+      req.body.createdAt = new Date().toISOString();
+    } else if(req.method === 'PUT') {
+      req.body.editedAt = new Date().toISOString();
+    }
+    next()
+  });
+  mockServer.use(jsonServer.router('server/mock.json'));
+  app.use('/api', mockServer);
+} else {
+  const prodServer = require('./endpoints');
+  app.use('/api', authCheck(), prodServer);
+}
+
 
 // In production we need to pass these values in instead of relying on webpack
 setup(app, {
