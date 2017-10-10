@@ -1,3 +1,11 @@
+# notepad-wiki
+
+The MIT License (MIT)
+
+Copyright (c) 2017-present @magiccookie
+
+# react-boilerplate
+
 The MIT License (MIT)
 
 Copyright (c) 2017 Maximilian Stoiber

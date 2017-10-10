@@ -1,16 +1,16 @@
 {
-  "name": "react-boilerplate",
-  "version": "3.4.0",
-  "description": "A highly scalable, offline-first foundation with the best DX and a focus on performance and best practices",
+  "name": "notepad-wiki",
+  "version": "0.1.0",
+  "description": "web application for taking notes",
   "repository": {
     "type": "git",
-    "url": "git://github.com/react-boilerplate/react-boilerplate.git"
+    "url": "https://github.com/magiccookie/notepad-wiki.git"
   },
   "engines": {
     "npm": "3.10.x",
     "node": "6.10.3"
   },
-  "author": "Max Stoiber",
+  "author": "@magiccookie",
   "license": "MIT",
   "scripts": {
     "analyze:clean": "rimraf stats.json",
