@@ -84,6 +84,8 @@ module.exports = (options) => ({
     }),
     new webpack.NamedModulesPlugin(),
     new webpack.ContextReplacementPlugin(/\.\/locale$/, 'empty-module', false, /js$/),
+    new webpack.IgnorePlugin(/pg-native/, /\/pg\//),
+    new webpack.IgnorePlugin(/pgpass/, /\/pg\//),
   ]),
   resolve: {
     modules: ['app', 'node_modules'],
