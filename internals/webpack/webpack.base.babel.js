@@ -83,7 +83,7 @@ module.exports = (options) => ({
       },
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.ContextReplacementPlugin(/\.\/locale$/, 'empty-module', false, /js$/),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /\moment\//),
     new webpack.IgnorePlugin(/pg-native/, /\/pg\//),
     new webpack.IgnorePlugin(/pgpass/, /\/pg\//),
   ]),
