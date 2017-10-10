@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const argv = require('minimist')(process.argv.slice(2));
 const setup = require('./middlewares/frontendMiddleware');
 const isDev = process.env.NODE_ENV !== 'production';
-const ngrok = (isDev && process.env.ENABLE_TUNNEL) || argv.tunnel ? require('ngrok') : false;
+const ngrok = process.env.ENABLE_TUNNEL || argv.tunnel ? require('ngrok') : false;
 const resolve = require('path').resolve;
 
 const passport = require('passport');
@@ -57,6 +57,7 @@ app.post("/api/check", authCheck(), (req, res) => {
   res.json(req.user);
 });
 
+
 app.post("/api/token", (req, res) => {
   if (req.body.username && req.body.password) {
     const username = req.body.username;
@@ -78,6 +79,7 @@ app.post("/api/token", (req, res) => {
   }
 });
 
+
 if (isDev) {
   const jsonServer = require('json-server');
   const mockServer = jsonServer.create();
@@ -91,10 +93,10 @@ if (isDev) {
     next()
   });
   mockServer.use(jsonServer.router('server/mock.json'));
-  app.use('/api', mockServer);
+  app.use('/api', authCheck(), mockServer);
 } else {
-  const prodServer = require('./endpoints');
-  app.use('/api', authCheck(), prodServer);
+  const routes = require('./routes');
+  app.use('/api', authCheck(), routes.router);
 }
 
 
