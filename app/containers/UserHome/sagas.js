@@ -20,7 +20,7 @@ function* fetchPostsTask() {
 
 function* deleteNoteTask(action) {
   const token = localStorage.getItem('jwt-token');
-  const id = action.payload;
+  const id = action.payload.get("id");
 
   if (token) {
     try {

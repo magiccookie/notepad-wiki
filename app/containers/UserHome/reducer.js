@@ -17,7 +17,9 @@ export function postsReducer(state = initialState, action) {
     case c.PUT_LATEST_POSTS:
       return state.set('posts', action.payload);
     case c.DELETE_NOTE:
-      return state.set('posts', state.get('posts').delete(action.index));
+      return state.deleteIn(['posts',
+                             state.get('posts')
+                                  .indexOf(action.payload)]);
     default:
       return state;
   }

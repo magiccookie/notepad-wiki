@@ -28,15 +28,14 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
     this.props.dispatch(push(url));
   }
 
-  deleteNote = (note, index, e) => {
-    const id = note.get("id");
-    this.props.dispatch(a.deleteNote(id, index));
+  deleteNote = (note, e) => {
+    this.props.dispatch(a.deleteNote(note));
   }
 
   addNew = () => this.props.dispatch(push('/create/'));
 
   render() {
-    const content = this.props.posts.reverse().map((note, index) => (
+    const content = this.props.posts.reverse().map((note) => (
       <Grid.Column
         key={note.get("id")}
       >
@@ -53,7 +52,7 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
                 >
                   <Dropdown.Menu>
                     <Dropdown.Item
-                      onClick={(e) => this.deleteNote(note, index, e)}
+                      onClick={(e) => this.deleteNote(note, e)}
                     >
                       Delete
                     </Dropdown.Item>

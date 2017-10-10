@@ -6,8 +6,8 @@
 
 import * as c from './constants';
 
-export function deleteNote(id, index) {
-  return { type: c.DELETE_NOTE, payload: id, index: index};
+export function deleteNote(note) {
+  return { type: c.DELETE_NOTE, payload: note };
 }
 
 export function deleteSuccess(status) {
