@@ -49,7 +49,7 @@ function* saveNoteTask() {
       const result = yield call(r.createNote, note, token);
       yield put(a.createSuccess(result));
       yield put(push('/')); // hack due to https://github.com/ReactTraining/react-router/issues/4578
-      yield put(push(`/note/${result.get("name")}/`));
+      yield put(push(`/note/${note.get("name")}/`));
     } catch (err) {
       yield put(a.createError(err));
     }
