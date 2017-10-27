@@ -12,3 +12,10 @@ CREATE TABLE notes (
   createdAt TIMESTAMP,
   editedAt  TIMESTAMP
 );
+
+CREATE TABLE users (
+  ID SERIAL PRIMARY KEY,
+  user      VARCHAR(64) not null,
+  hash      VARCHAR(255) not null,
+  email     VARCHAR(255)
+);
