@@ -1,23 +1,21 @@
 /*
  *
- * LoginForm reducer
+ * signUp reducer
  *
  */
 
 import { fromJS } from 'immutable';
-import {
-  DEFAULT_ACTION,
-} from './constants';
+import * as c from './constants';
 
 const initialState = fromJS({});
 
-function loginFormReducer(state = initialState, action) {
+function signUpReducer(state = initialState, action) {
   switch (action.type) {
-    case DEFAULT_ACTION:
+    case c.SIGNUP:
       return state;
     default:
       return state;
   }
 }
 
-export default loginFormReducer;
+export default signUpReducer;

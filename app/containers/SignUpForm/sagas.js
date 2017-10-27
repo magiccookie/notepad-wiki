@@ -1,11 +1,27 @@
-// import { take, call, put, select } from 'redux-saga/effects';
+import { take, call, cancel, put, takeLatest } from 'redux-saga/effects';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
-// Individual exports for testing
-export function* defaultSaga() {
-  // See example in containers/HomePage/sagas.js
+import * as c from './constants';
+import * as r from '../../utils/request';
+import * as a from './actions';
+
+export function* signupTask(action) {
+  const credentials = action.payload;
+
+  try {
+    const result = yield call(r.signup, credentials);
+    yield put(a.signupSuccess(result));
+  } catch (err) {
+    yield put(a.signupError(err));
+  }
 }
 
-// All sagas to be loaded
+function* signupWatcher() {
+  const watcher = yield takeLatest(c.SIGNUP, signupTask);
+  yield take(LOCATION_CHANGE);
+  yield cancel(watcher);
+}
+
 export default [
-  defaultSaga,
+  signupWatcher,
 ];

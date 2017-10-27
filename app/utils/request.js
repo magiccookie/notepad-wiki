@@ -114,6 +114,18 @@ export function deleteNote(id, token) {
 }
 
 
+export function signup(data) {
+  return fetch('/api/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}
+
+
 export function requestAuth(data) {
   return fetch('/api/token', {
     method: 'POST',

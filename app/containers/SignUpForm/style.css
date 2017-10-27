@@ -1,0 +1,8 @@
+.authForm {
+  margin: 1rem auto 0 auto;
+  max-width: 400px;
+}
+
+.authForm__header {
+  text-align: center;
+}

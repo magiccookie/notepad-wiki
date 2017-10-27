@@ -1,15 +1,13 @@
-/*
- *
- * LoginForm actions
- *
- */
+import * as c from './constants';
 
-import {
-  DEFAULT_ACTION,
-} from './constants';
+export function signup(credentials) {
+  return { type: c.SIGNUP, payload: credentials };
+}
 
-export function defaultAction() {
-  return {
-    type: DEFAULT_ACTION,
-  };
+export function signupSuccess() {
+  return { type: "REPORT", payload: "Signup success" };
+}
+
+export function signupError(err) {
+  return { type: "ERROR", payload: err };
 }
