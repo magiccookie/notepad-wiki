@@ -33,18 +33,15 @@ if (isDev) {
 }
 
 const crypto = require('crypto');
-const config = { jwtSecret: crypto.randomBytes(32).toString('hex')};
-
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeader(),
-  secretOrKey: config.jwtSecret,
-  algorithms: ['HS256']
+  secretOrKey:    crypto.randomBytes(32).toString('hex'),
+  algorithms:     ['HS256']
 };
 
 const strategy =  new Strategy(opts, (payload, done) => {
-  const user = users.find((u) =>
-    { return u.username === payload.username }) || null;
-  if (user) {
+  const user = payload.username;
+  if (!!user) {
     return done(null, payload);
   } else {
     return done(new Error("User not found"), null);
@@ -57,28 +54,41 @@ app.post("/api/check", authCheck(), (req, res) => {
   res.json(req.user);
 });
 
-
-app.post("/api/token", (req, res) => {
+const devToken = (req, res) => {
   if (req.body.username && req.body.password) {
     const username = req.body.username;
     const password = req.body.password;
     const user = users.find((u) => {
       return u.username === username &&
-      u.password === password;
+             u.password === password;
     });
 
     if (user) {
       const payload = { username: username };
-      const token = jwt.encode(payload, config.jwtSecret);
+      const token = jwt.encode(payload, opts.secretOrKey, opts.algorithms[0]);
       res.json({ token: token });
     } else {
       res.sendStatus(401);
     }
   } else {
     res.sendStatus(401);
-  }
-});
+    }
+}
 
+const devSignup = (req, res) => {
+  if (req.body.username && req.body.password) {
+    const username  = req.body.username.trim().toLowerCase();
+    const email     = req.body.email.trim().toLowerCase();
+    const password  = req.body.password.trim();
+    const challenge = req.body.challenge || '';
+
+    try {
+      return res.status(200).json({ username: username });
+    } catch (err) {
+      return res.status(401).json(err);
+    }
+  }
+}
 
 if (isDev) {
   const jsonServer = require('json-server');
@@ -93,9 +103,13 @@ if (isDev) {
     next()
   });
   mockServer.use(jsonServer.router('server/mock.json'));
+  app.post('/api/token', (req, res) => devToken(req, res));
+  app.post('/api/signup', (req, res) => devSignup(req, res));
   app.use('/api', authCheck(), mockServer);
 } else {
   const routes = require('./routes');
+  app.post('/api/token', (req, res) => routes.token(opts)(req, res));
+  app.post('/api/signup', (req, res) => routes.signup(req, res));
   app.use('/api', authCheck(), routes.router);
 }
 

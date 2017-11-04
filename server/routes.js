@@ -7,6 +7,68 @@ const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/
 const client = new pg.Client(connectionString);
 client.connect();
 
+
+const passportJWT = require('passport-jwt');
+const ExtractJwt = passportJWT.ExtractJwt;
+
+const jwt = require('jwt-simple');
+const crypto = require('crypto');
+
+const secret = process.env.NOTEPAD_WIKI_KEY || 'notepad-wiki';
+const encSHA512 = (value) => crypto.createHmac('sha512', secret)
+                                   .update(value)
+                                   .digest('hex');
+
+const postToken = (opts) => (req, res) => {
+  if (req.body.username && req.body.password) {
+    const username = req.body.username.trim().toLowerCase();
+    const password = req.body.password.trim();
+
+    const hash = encSHA512(password);
+    client.query('SELECT * FROM users WHERE username=$1 AND hash=$2', [username, hash])
+          .then((data) => {
+            const payload = { username: username };
+            const token = jwt.encode(payload, opts.secretOrKey, opts.algorithms[0]);
+            res.status(200).json({ token: token });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(401).json(err);
+          });
+  }
+}
+
+
+const verifyChallenge = (challenge) => true;
+const verifyUser = (username) => true;
+
+const postSignup = (req, res) => {
+  if (req.body.username && req.body.password) {
+    const username  = req.body.username.trim().toLowerCase();
+    const email     = req.body.email.trim().toLowerCase();
+    const password  = req.body.password.trim();
+    const challenge = req.body.challenge || '';
+
+    if (username && password && challenge) {
+      try {
+        verifyChallenge(challenge);
+        verifyUser(username);
+        const hash = encSHA512(password);
+        client.query('INSERT INTO users(username, hash, email) values($1, $2, $3)', [username, hash, email])
+              .then((data) => {
+                return res.status(200).json(data);
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.status(401).json(err);
+              });
+      } catch (err) {
+        return res.status(401).json(err);
+      }
+    }
+  }
+}
+
 router.route("/posts/:note_id?")
       .get((req, res, next) => {
         if (req.query.name) {
@@ -79,3 +141,5 @@ router.route("/posts/:note_id?")
       });
 
 exports.router = router;
+exports.token  = postToken;
+exports.signup = postSignup;

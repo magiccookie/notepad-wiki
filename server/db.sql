@@ -5,7 +5,7 @@ CREATE DATABASE         notepad_wiki;
 
 CREATE TABLE notes (
   ID SERIAL PRIMARY KEY,
-  owner     VARCHAR(64) not null,
+  owner     VARCHAR(64),
   name      VARCHAR(255) not null,
   header    VARCHAR(255),
   content   VARCHAR(8192),
@@ -15,7 +15,7 @@ CREATE TABLE notes (
 
 CREATE TABLE users (
   ID SERIAL PRIMARY KEY,
-  user      VARCHAR(64) not null,
+  username  VARCHAR(64) not null,
   hash      VARCHAR(255) not null,
   email     VARCHAR(255)
 );

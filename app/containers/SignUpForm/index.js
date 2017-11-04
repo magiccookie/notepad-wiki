@@ -15,6 +15,8 @@ import { Checkbox, Form, Grid, Header,
          Segment, Message,
          Button, Input } from 'semantic-ui-react';
 
+import { fromJS } from 'immutable';
+
 import Panel from '../../components/Panel';
 
 import { makeSelectLoggedIn } from '../../reducers/Auth/selectors';
@@ -58,7 +60,7 @@ export class SignUpForm extends React.Component { // eslint-disable-line react/p
   handleSubmit = (e) => {
     e.preventDefault();
     if (this.state.username && this.state.password) {
-      this.props.dispatch(signup(this.state));
+      this.props.dispatch(signup(fromJS(this.state)));
       this.setState(this.initialState);
     }
   }
