@@ -25,11 +25,19 @@ const postToken = (opts) => (req, res) => {
     const password = req.body.password.trim();
 
     const hash = encSHA512(password);
-    client.query('SELECT * FROM users WHERE username=$1 AND hash=$2', [username, hash])
+    client.query(`SELECT 1
+                  FROM users
+                  WHERE username=$1
+                  AND hash=$2`,
+                 [username, hash])
           .then((data) => {
-            const payload = { username: username };
-            const token = jwt.encode(payload, opts.secretOrKey, opts.algorithms[0]);
-            res.status(200).json({ token: token });
+            if (data.rows.length) {
+              const payload = { username: username };
+              const token = jwt.encode(payload, opts.secretOrKey, opts.algorithms[0]);
+              res.status(200).json({ token: token });
+            } else {
+              return res.status(401)
+            }
           })
           .catch((err) => {
             console.log(err);
@@ -54,7 +62,10 @@ const postSignup = (req, res) => {
         verifyChallenge(challenge);
         verifyUser(username);
         const hash = encSHA512(password);
-        client.query('INSERT INTO users(username, hash, email) values($1, $2, $3)', [username, hash, email])
+        client.query(`INSERT
+                      INTO users(username, hash, email)
+                      values($1, $2, $3)`,
+                     [username, hash, email])
               .then((data) => {
                 return res.status(200).json(data);
               })
@@ -71,9 +82,14 @@ const postSignup = (req, res) => {
 
 router.route("/posts/:note_id?")
       .get((req, res, next) => {
+        const owner = req.user;
         if (req.query.name) {
           const name = req.query.name;
-          client.query('SELECT * FROM notes WHERE name=$1', [name])
+          client.query(`SELECT *
+                        FROM notes
+                        WHERE (owner IS NULL OR owner=$1)
+                        AND name=$2`,
+                       [owner, name])
                 .then((data) => {
                   return res.status(200).json(data.rows)
                 })
@@ -81,7 +97,10 @@ router.route("/posts/:note_id?")
                   return res.status(500).json(err);
                 })
         } else {
-          client.query('SELECT * FROM notes')
+          client.query(`SELECT *
+                        FROM notes
+                        WHERE (owner IS NULL OR owner=$1)`,
+                       [owner])
                 .then((data) => {
                   return res.status(200).json(data.rows)
                 })
@@ -91,8 +110,9 @@ router.route("/posts/:note_id?")
         }
       })
       .post((req, res, next) => {
+        const owner = req.user;
         const note = {
-          owner: req.user || 'demo',
+          owner: owner,
           name: req.body.name,
           header: req.body.header,
           content: req.body.content,
@@ -100,7 +120,9 @@ router.route("/posts/:note_id?")
           editedAt: new Date().toISOString(),
         };
 
-        client.query('INSERT INTO notes(owner, name, header, content, createdAt, editedAt) values($1, $2, $3, $4, $5, $6)',
+        client.query(`INSERT
+                      INTO notes(owner, name, header, content, createdAt, editedAt)
+                      values($1, $2, $3, $4, $5, $6)`,
                      [note.owner, note.name, note.header, note.content, note.createdAt, note.editedAt])
               .then((data) => {
                 return res.status(200).json(data);
@@ -111,6 +133,7 @@ router.route("/posts/:note_id?")
               });
       })
       .put((req, res) => {
+        const owner = req.user;
         const note_id = req.params.note_id;
         const note = {
           name: req.body.name,
@@ -118,8 +141,11 @@ router.route("/posts/:note_id?")
           content: req.body.content,
           editedAt: new Date().toISOString(),
         };
-        client.query('UPDATE notes SET name=($1), header=($2), content=($3), editedAt=($4) WHERE id=($5)',
-                     [note.name, note.header, note.content, note.editedAt, note_id])
+        client.query(`UPDATE notes
+                      SET name=($1), header=($2), content=($3), editedAt=($4)
+                      WHERE id=($5)
+                      AND (owner IS NULL OR owner=($6))`,
+                     [note.name, note.header, note.content, note.editedAt, note_id, owner])
               .then((data) => {
                 return res.status(200).json(data);
               })
@@ -129,8 +155,12 @@ router.route("/posts/:note_id?")
               });
       })
       .delete((req, res, next) => {
+        const owner = req.user;
         const note_id = req.params.note_id;
-        client.query('DELETE FROM notes WHERE id=($1)', [note_id])
+        client.query(`DELETE
+                      FROM notes
+                      WHERE id=($1)
+                      AND (owner IS NULL OR owner=($2))`, [note_id, owner])
               .then((data) => {
                 return res.status(200).json(data);
               })
