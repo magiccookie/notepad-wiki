@@ -113,7 +113,12 @@ router.route("/posts/:note_id?")
         const owner = req.user;
         const note = {
           owner: owner,
-          name: req.body.name,
+          name: req.body.name.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, ''),
           header: req.body.header,
           content: req.body.content,
           createdAt: new Date().toISOString(),
