@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const utils = require('./utils')
 
 const pg = require('pg');
 const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/notepad_wiki';
@@ -113,18 +114,16 @@ router.route("/posts/:note_id?")
         const owner = req.user;
         const note = {
           owner: owner,
-          name: req.body.name.toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-')
-            .replace(/^-+/, '')
-            .replace(/-+$/, ''),
+          name: req.body.name,
           header: req.body.header,
           content: req.body.content,
           createdAt: new Date().toISOString(),
           editedAt: new Date().toISOString(),
         };
 
+        if (!utils.validate_name(note.name)){
+          return res.status(500).json({"error":"invalid name"});          
+        }
         client.query(`INSERT
                       INTO notes(owner, name, header, content, createdAt, editedAt)
                       values($1, $2, $3, $4, $5, $6)`,
@@ -146,6 +145,9 @@ router.route("/posts/:note_id?")
           content: req.body.content,
           editedAt: new Date().toISOString(),
         };
+        if (!utils.validate_name(note.name)){
+          return res.status(500).json({"error":"invalid name"});          
+        }
         client.query(`UPDATE notes
                       SET name=($1), header=($2), content=($3), editedAt=($4)
                       WHERE id=($5)
