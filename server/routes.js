@@ -99,7 +99,8 @@ router.route("/posts/:note_id?")
         } else {
           client.query(`SELECT *
                         FROM notes
-                        WHERE (owner IS NULL OR owner=$1)`,
+                        WHERE (owner IS NULL OR owner=$1)
+                        ORDER BY editedAt ASC`,
                        [owner])
                 .then((data) => {
                   return res.status(200).json(data.rows)
