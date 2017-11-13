@@ -8,7 +8,7 @@ import React, { PropTypes } from 'react';
 import { Button, Card, Container, Dropdown, Icon, Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
-
+import { nameToUrl } from '../../utils/helpers';
 import * as s from './selectors';
 import * as a from './actions';
 
@@ -23,8 +23,8 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
   }
 
   clickOnCard = (note, e) => {
-    const name = note.get("name");
-    const url = `/note/${name}/`;
+    const noteNameSanitized = nameToUrl(note.get("name"));
+    const url = `/note/${noteNameSanitized}/`;
     this.props.dispatch(push(url));
   }
 
