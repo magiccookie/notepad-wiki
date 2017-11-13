@@ -2,6 +2,7 @@ import { delay } from 'redux-saga';
 import { take, call, cancel, put, select, takeLatest } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { push } from 'react-router-redux';
+import { nameToUrl } from '../../utils/helpers';
 
 import * as c from './constants'
 import * as a from './actions';
@@ -10,11 +11,11 @@ import * as r from 'utils/request';
 
 function* fetchNoteTask(action) {
   const token = localStorage.getItem('jwt-token');
-  const noteName = action.payload;
+  const noteNameSanitized = nameToUrl(action.payload);
 
   if (token) {
     try {
-      const result = yield call(r.fetchNote, noteName, token);
+      const result = yield call(r.fetchNote, noteNameSanitized, token);
       yield put(a.fetchSuccess(result));
     } catch (err) {
       yield put(a.fetchError(err));
@@ -43,13 +44,14 @@ function* modifyNoteTask() {
 function* saveNoteTask() {
   const token = localStorage.getItem('jwt-token');
   const note = yield select(s.selectCreatedNote);
+  const noteNameSanitized = nameToUrl(note.get("name"));
 
   if (token) {
     try {
       const result = yield call(r.createNote, note, token);
       yield put(a.createSuccess(result));
       yield put(push('/')); // hack due to https://github.com/ReactTraining/react-router/issues/4578
-      yield put(push(`/note/${note.get("name")}/`));
+      yield put(push(`/note/${noteNameSanitized}/`));
     } catch (err) {
       yield put(a.createError(err));
     }

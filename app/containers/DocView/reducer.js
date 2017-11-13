@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-import { headerToUrl, randomName } from 'utils/helpers'
+import { headerToName, randomName } from 'utils/helpers'
 import * as c from './constants';
 
 
@@ -20,7 +20,7 @@ export function DocViewReducer(state = initialState, action) {
     case c.SAVE_NOTE:
       let payload = fromJS(action.payload);
       if (payload.get("header")) {
-        payload = payload.set("name", headerToUrl(payload.get("header")));
+        payload = payload.set("name", headerToName(payload.get("header")));
       } else {
         payload = payload.set("name", randomName());
       }
@@ -32,7 +32,7 @@ export function DocViewReducer(state = initialState, action) {
     case c.UPDATE_ACTIVE_NOTE_HEADER:
       let noteName;
       if (action.payload) {
-        noteName = headerToUrl(action.payload)
+        noteName = headerToName(action.payload)
       } else if (state.get("activeNote").get("header")){
         noteName = randomName()
       } else {
