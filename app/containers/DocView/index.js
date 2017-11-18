@@ -12,7 +12,6 @@ import Helmet from 'react-helmet';
 import marked from 'marked';
 
 import Panel from '../../components/Panel';
-import { urlToName } from '../../utils/helpers';
 
 import * as a from './actions';
 import * as s from './selectors';
@@ -39,7 +38,7 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
       this.setState({ isCreateMode: true });
       this.toggleEditMode();
     } else {
-      const noteName = urlToName(this.props.params.note);
+      const noteName = this.props.params.note;
       this.props.dispatch(a.getNoteByName(noteName));
     }
   }
