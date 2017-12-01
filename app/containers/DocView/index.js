@@ -112,7 +112,7 @@ class DocView extends React.Component { // eslint-disable-line react/prefer-stat
   render() {
     return (
       <div>
-        <Panel />
+        <Panel search={true}/>
         <Container>
           <Grid
             columns={2}

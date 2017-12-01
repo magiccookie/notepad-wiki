@@ -38,18 +38,13 @@ class LoginButton extends React.Component { // eslint-disable-line react/prefer-
 
   render() {
     return (
-      <div className="login">
+      <div className="panel__login">
         { this.props.loggedIn ? (
-            <span className="login__profile">
+            <span className="login-profile">
               { this.props.profile.get('username')} (<a href="/" onClick={this.logOut}>log out</a>)
             </span>
           ) : (
-            <Link
-              className="login__link"
-              to="/login/"
-            >
-              Log-in/Sign up
-            </Link>
+            <Link className="login-link" to="/login/" >Log-in/Sign up</Link>
           )
         }
       </div>

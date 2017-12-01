@@ -10,9 +10,9 @@ import './style.css';
 
 const Logo = () => {
   return (
-    <div className="logo">
+    <div className="panel__logo">
       <h3>
-        <Link className="logo__link" to="/">
+        <Link className="logo-link" to="/">
           notepad-wiki
         </Link>
       </h3>

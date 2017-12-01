@@ -1,15 +1,11 @@
-.login {
-  flex: 0 1 auto;
-}
-
-.login__link {
+.login-link {
   margin-top: 1rem;
   margin-right: 2rem;
   border-bottom-width: 1px;
   border-bottom-style: dotted;
 }
 
-.login__profile {
+.login-profile {
   margin-top: 1rem;
   margin-right: 2rem;
 }

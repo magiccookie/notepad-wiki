@@ -1,6 +1,23 @@
 .panel {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: baseline;
+}
+
+.panel__box {
+  flex: 1;
+  display: flex;
+}
+
+.panel__logo {
+  flex: 1;
+}
+
+.panel__login {
+  flex: 0 1 auto;
+}
+
+.panel__search {
+  flex: 1 1 20%;
 }

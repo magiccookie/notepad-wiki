@@ -89,7 +89,7 @@ class UserHome extends React.Component { // eslint-disable-line react/prefer-sta
 
     return (
       <div>
-        <Panel />
+        <Panel search={true}/>
         <Container>
           <Grid
             relaxed
@@ -111,7 +111,7 @@ UserHome.propTypes = {
   dispatch: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({posts: s.makeSelectPosts(state)});
+const mapStateToProps = (state) => ({ posts: s.makeSelectPosts(state) });
 
 const mapDispatchToProps = (dispatch) => ({ dispatch });
 
