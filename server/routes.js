@@ -124,25 +124,27 @@ router.route("/posts/:note_id?")
     } else {
       client.query(`SELECT *
                         FROM notes
-                        WHERE (owner IS NULL OR owner=$1)`, [owner])
-        .then((data) => {
-          return res.status(200).json(data.rows)
-        })
-        .catch((err) => {
-          return res.status(500).json(err);
-        })
-    }
-  })
-  .post((req, res, next) => {
-    const owner = req.user;
-    const note = {
-      owner: owner,
-      name: req.body.name,
-      header: req.body.header,
-      content: req.body.content,
-      createdAt: new Date().toISOString(),
-      editedAt: new Date().toISOString(),
-    };
+                        WHERE (owner IS NULL OR owner=$1)
+                        ORDER BY editedAt ASC`,
+                       [owner])
+                .then((data) => {
+                  return res.status(200).json(data.rows)
+                })
+                .catch((err) => {
+                  return res.status(500).json(err);
+                })
+        }
+      })
+      .post((req, res, next) => {
+        const owner = req.user;
+        const note = {
+          owner: owner,
+          name: req.body.name,
+          header: req.body.header,
+          content: req.body.content,
+          createdAt: new Date().toISOString(),
+          editedAt: new Date().toISOString(),
+        };
 
     if (validateNote(note.name)) {
       return res.status(500).json({
