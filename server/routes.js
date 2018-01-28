@@ -74,6 +74,21 @@ const validateNote = async note => {
 }
 
 
+const validateNoteUpdate = async note => {
+  const isMatched = note.name.match(/^\S*$/);
+  if (!!isMatched) {
+    const { rows } = await client.query(`SELECT EXISTS (SELECT 1
+                                         FROM notes
+                                         WHERE name=$1
+                                         AND id != $2)`,
+                                        [note.name, note.id]);
+    return !rows[0].exists;
+  } else {
+    return false;
+  }
+}
+
+
 const postSignup = async (req, res) => {
   if (req.body.username && req.body.password) {
     const username = req.body.username.trim().toLowerCase();
@@ -142,14 +157,13 @@ router.route("/posts/:note_id?")
         }
       })
       .post(async (req, res, next) => {
-        const owner = req.user;
         const note = {
-          owner: owner,
-          name: req.body.name.trim().toLowerCase(),
-          header: req.body.header,
-          content: req.body.content,
+          owner:     req.user,
+          name:      req.body.name.trim().toLowerCase(),
+          header:    req.body.header,
+          content:   req.body.content,
           createdAt: new Date().toISOString(),
-          editedAt: new Date().toISOString(),
+          editedAt:  new Date().toISOString(),
         };
 
         const isValidNote = await validateNote(note)
@@ -170,17 +184,17 @@ router.route("/posts/:note_id?")
                 return res.status(500).json({ errors: { status: 500 }});
               });
       })
-      .put( async (req, res) => {
-        const owner = req.user;
-        const note_id = req.params.note_id;
+      .put(async (req, res) => {
         const note = {
-          name: req.body.name.trim().toLowerCase(),
-          header: req.body.header,
-          content: req.body.content,
+          id:       req.params.note_id,
+          owner:    req.user,
+          name:     req.body.name.trim().toLowerCase(),
+          header:   req.body.header,
+          content:  req.body.content,
           editedAt: new Date().toISOString(),
         };
 
-        const isValidNote = await validateNote(note)
+        const isValidNote = await validateNoteUpdate(note)
         if (!isValidNote) {
           console.error("Invalid note name");
           return res.status(500).json({ errors: { status: 500, title: "Invalid note name" }});
@@ -190,7 +204,7 @@ router.route("/posts/:note_id?")
                       SET name=($1), header=($2), content=($3), editedAt=($4)
                       WHERE id=($5)
                       AND (owner IS NULL OR owner=($6))`,
-                     [note.name, note.header, note.content, note.editedAt, note_id, owner])
+                     [note.name, note.header, note.content, note.editedAt, note.id, note.owner])
               .then((data) => {
                 return res.status(200).json(data);
               })
@@ -200,12 +214,14 @@ router.route("/posts/:note_id?")
               });
       })
       .delete((req, res, next) => {
-        const owner = req.user;
-        const note_id = req.params.note_id;
+        const note = {
+          id:    req.params.note_id,
+          owner: req.user
+        }
         client.query(`DELETE
                       FROM notes
                       WHERE id=($1)
-                      AND (owner IS NULL OR owner=($2))`, [note_id, owner])
+                      AND (owner IS NULL OR owner=($2))`, [note.id, note.owner])
               .then((data) => {
                 return res.status(200).json(data);
               })
