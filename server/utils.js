@@ -1,1 +1,0 @@
-module.exports.validateName = (text) => !!text.toString().toLowerCase().match(/^[a-z0-9-]+$/)
