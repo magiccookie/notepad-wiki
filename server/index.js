@@ -33,9 +33,10 @@ if (isDev) {
 }
 
 const crypto = require('crypto');
+const jwt_secret = process.env.NOTEPAD_WIKI_JWT_SECRET;
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeader(),
-  secretOrKey:    crypto.randomBytes(32).toString('hex'),
+  secretOrKey:    jwt_secret || crypto.randomBytes(32).toString('hex'),
   algorithms:     ['HS256']
 };
 
@@ -108,7 +109,7 @@ if (isDev) {
   app.use('/api', authCheck(), mockServer);
 } else {
   const routes = require('./routes');
-  app.post('/api/token', (req, res) => routes.token(opts)(req, res));
+  app.post('/api/token',  (req, res) => routes.token(opts)(req, res));
   app.post('/api/signup', (req, res) => routes.signup(req, res));
   app.use('/api', authCheck(), routes.router);
 }
