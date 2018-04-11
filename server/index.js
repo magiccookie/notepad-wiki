@@ -109,8 +109,10 @@ if (isDev) {
   app.use('/api', authCheck(), mockServer);
 } else {
   const routes = require('./routes');
+  const search = require('./search');
   app.post('/api/token',  (req, res) => routes.token(opts)(req, res));
   app.post('/api/signup', (req, res) => routes.signup(req, res));
+  app.post('/api/search', (req, res) => search.search(req, res));
   app.use('/api', authCheck(), routes.router);
 }
 
