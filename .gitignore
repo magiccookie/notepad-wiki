@@ -12,3 +12,4 @@ npm-debug.log
 .dir-locals.el
 .yarnclean
 draft
+yarn-error.log
