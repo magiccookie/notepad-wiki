@@ -9,23 +9,38 @@ import { nameToUrl } from '../../utils/helpers';
 import * as a from '../../reducers/Search/actions';
 import { makeSelectSearchResults } from '../../reducers/Search/selectors';
 
-class SearchResults extends React.Component {
+class SearchBar extends React.Component {
+
+  componentWillMount() {
+    this.setState({ isLoading: false, value: '' });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!!nextProps.source) {
+      this.setState({ isLoading: false })
+    }
+  }
+
+  handleChange = (e) => {
+    const value = e.target.value
+    this.setState({ isLoading: true, value: value })
+    this.props.dispatch(a.search(value))
+  }
 
   handleClick = (result, e) => {
     const noteNameSanitized = nameToUrl(result.get("name"))
     const url = `/note/${noteNameSanitized}/`
+    this.setState({ value: '' })
     this.props.dispatch(push(url))
   }
 
-  SingleItem = (result) => {
+  singleItem = (result) => {
     const id          = result.get('id')
     const title       = result.get('header')
     const description = result.get('content').substr(0, 90)
     return (
       <div className='result' key={`item-${id}`} >
-        <div
-          className='content'
-        >
+        <div className='content' onClick={() => this.handleClick(result)} >
           {title && <div className='title'>{title}</div>}
           {description && <div className='description'>{description}</div>}
         </div>
@@ -43,29 +58,16 @@ class SearchResults extends React.Component {
 
   foundResults = (results) => (
     <div className="results transition visible">
-      { results.map(result => this.SingleItem(result)) }
+      { results.map(result => this.singleItem(result)) }
     </div>
   )
 
-  render() {
-    const { results } = this.props;
+  searchResults = (results) => {
     if (results && results.size) {
       return ( this.foundResults(results) )
     } else {
       return ( this.nomatch() )
     }
-  }
-}
-
-class SearchBar extends React.Component {
-  componentWillMount() {
-    this.setState({ isLoading: false, value: '' });
-  }
-
-  handleChange = (e) => {
-    const value = e.target.value
-    this.setState({ isLoading: true, value: value })
-    this.props.dispatch(a.search(value))
   }
 
   render() {
@@ -85,7 +87,7 @@ class SearchBar extends React.Component {
           />
           <i aria-hidden="true" className="search icon"></i>
         </div>
-        {!!value && <SearchResults results={source} dispatch={this.props.dispatch}/> }
+        {!!value && this.searchResults(source)}
       </div>
     );
   }
