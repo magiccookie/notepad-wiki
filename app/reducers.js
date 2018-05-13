@@ -10,6 +10,8 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import { authReducer } from 'reducers/Auth/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 
+import { searchReducer } from 'reducers/Search/reducer'
+
 /*
  * routeReducer
  *
@@ -48,6 +50,7 @@ const appReducer = (asyncReducers) => combineReducers({
   route: routeReducer,
   language: languageProviderReducer,
   auth: authReducer,
+  search: searchReducer,
   ...asyncReducers,
 });
 

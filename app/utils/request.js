@@ -150,3 +150,17 @@ export function requestCheckUser(token) {
     .then(parseJSON)
     .then(toImmutable);
 }
+
+export function searchNotes(query, token) {
+  return fetch('/api/search/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `JWT ${token}`,
+    },
+    body: JSON.stringify({ query }),
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(toImmutable);
+}

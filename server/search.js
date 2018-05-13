@@ -5,7 +5,7 @@ client.connect()
 
 const search = async (req, res) => {
   if (!!req.body.query && typeof req.body.query === "string") {
-    const owner = req.user;
+    const owner = req.user.username;
     const raw_query = req.body.query;
     const query = raw_query.trim()
                            .toLowerCase()
@@ -17,10 +17,10 @@ const search = async (req, res) => {
       const { rows } = await client.query(
         `SELECT *
          FROM notes
-         WHERE (to_tsvector(content) @@ to_tsquery($1))
-         ORDER BY editedAt ASC
-         LIMIT 10`,
-        [query]);
+         WHERE (to_tsvector(header || ' ' || content) @@ to_tsquery($1))
+         AND (owner=$2 OR owner IS NULL)
+         LIMIT 6`,
+        [query, owner]);
 
       return res.status(200).json(rows);
     } catch(err) {

@@ -123,7 +123,7 @@ const postSignup = async (req, res) => {
 
 router.route("/posts/:note_id?")
       .get(async (req, res, next) => {
-        const owner = req.user;
+        const owner = req.user.username;
         if (req.query.name) {
           const name = req.query.name;
 
@@ -158,7 +158,7 @@ router.route("/posts/:note_id?")
       })
       .post(async (req, res, next) => {
         const note = {
-          owner:     req.user,
+          owner:     req.user.username,
           name:      req.body.name.trim().toLowerCase(),
           header:    req.body.header,
           content:   req.body.content,
@@ -186,7 +186,7 @@ router.route("/posts/:note_id?")
       .put(async (req, res) => {
         const note = {
           id:       req.params.note_id,
-          owner:    req.user,
+          owner:    req.user.username,
           name:     req.body.name.trim().toLowerCase(),
           header:   req.body.header,
           content:  req.body.content,
@@ -214,7 +214,7 @@ router.route("/posts/:note_id?")
       .delete(async (req, res, next) => {
         const note = {
           id:    req.params.note_id,
-          owner: req.user
+          owner: req.user.username
         }
         try {
           const data = await client.query(`DELETE

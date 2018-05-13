@@ -1,24 +1,31 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { push } from 'react-router-redux';
+import { fromJS } from 'immutable';
 import { Search, Grid, Header } from 'semantic-ui-react';
 
-import { makeSelectPosts } from '../../containers/UserHome/selectors';
-import * as a from '../../containers/UserHome/actions';
-
-const source = [
-  { title: "hello",  description: "text"},
-  { title: "hello2", description: "text"},
-  { title: "hello3", description: "text"},
-  { title: "hello4", description: "text"},
-]
+import { nameToUrl } from '../../utils/helpers';
+import * as a from '../../reducers/Search/actions';
+import { makeSelectSearchResults } from '../../reducers/Search/selectors';
 
 class SearchResults extends React.Component {
 
-  SingleItem = ({ title, description }) => {
+  handleClick = (result, e) => {
+    const noteNameSanitized = nameToUrl(result.get("name"))
+    const url = `/note/${noteNameSanitized}/`
+    this.props.dispatch(push(url))
+  }
+
+  SingleItem = (result) => {
+    const id          = result.get('id')
+    const title       = result.get('header')
+    const description = result.get('content').substr(0, 90)
     return (
-      <div className='result' key={ `item-${title}` }>
-        <div className='content'>
+      <div className='result' key={`item-${id}`} >
+        <div
+          className='content'
+        >
           {title && <div className='title'>{title}</div>}
           {description && <div className='description'>{description}</div>}
         </div>
@@ -36,14 +43,13 @@ class SearchResults extends React.Component {
 
   foundResults = (results) => (
     <div className="results transition visible">
-      { results.map(i => this.SingleItem(i)) }
+      { results.map(result => this.SingleItem(result)) }
     </div>
   )
 
   render() {
     const { results } = this.props;
-
-    if (results && results.length) {
+    if (results && results.size) {
       return ( this.foundResults(results) )
     } else {
       return ( this.nomatch() )
@@ -53,29 +59,18 @@ class SearchResults extends React.Component {
 
 class SearchBar extends React.Component {
   componentWillMount() {
-    this.props.dispatch(a.getLatestPosts());
-    this.setState({ isLoading: false, results: [], value: '' });
+    this.setState({ isLoading: false, value: '' });
   }
 
   handleChange = (e) => {
-    const value = e.target.value;
-
+    const value = e.target.value
     this.setState({ isLoading: true, value: value })
-    const re = new RegExp(_.escapeRegExp(this.state.value));
-
-    setTimeout(() => {
-      const re = new RegExp(_.escapeRegExp(value), 'i')
-      const isMatch = result => re.test(result.title)
-
-      this.setState({
-        isLoading: false,
-        results: _.filter(source, isMatch),
-      })
-    }, 100)
+    this.props.dispatch(a.search(value))
   }
 
   render() {
-    const { isLoading, value, results } = this.state;
+    const { isLoading, value } = this.state;
+    const { source } = this.props;
 
     return (
       <div className="ui search panel__search">
@@ -90,19 +85,18 @@ class SearchBar extends React.Component {
           />
           <i aria-hidden="true" className="search icon"></i>
         </div>
-        {!!this.state.value && <SearchResults results={this.state.results}/> }
+        {!!value && <SearchResults results={source} dispatch={this.props.dispatch}/> }
       </div>
     );
   }
 }
 
 SearchBar.propTypes = {
-  source: PropTypes.array.isRequired,
+  source:   PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
 };
 
-/* const mapStateToProps = (state) => ({source: makeSelectPosts(state)});*/
-const mapStateToProps = (state) => ({ source: source });
+const mapStateToProps = (state) => ({source: makeSelectSearchResults(state)});
 const mapDispatchToProps = (dispatch) => ({ dispatch });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
